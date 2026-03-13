@@ -7,12 +7,17 @@ export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   async register(email: string, username: string, password: string) {
-    const existedUser = await this.prisma.user.findUnique({
-      where: { email },
+    const existingUser = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ email }, { username }],
+      },
     });
 
-    if (existedUser) {
+    if (existingUser?.email === email) {
       throw new BadRequestException('이미 해당 이메일이 존재합니다.');
+    }
+    if (existingUser?.username === username) {
+      throw new BadRequestException('이미 해당 이름이 존재합니다.');
     }
 
     const hashedPassword = await hash(password, 10);
