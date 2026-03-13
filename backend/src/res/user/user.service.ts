@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { hash } from 'bcrypt';
+import { create } from 'domain';
 
 @Injectable()
 export class UserService {
@@ -27,7 +28,13 @@ export class UserService {
         email,
         username,
         password: hashedPassword,
+        wallets: {
+          create: {
+            balance: 0,
+          },
+        },
       },
+      include: { wallets: true },
     });
 
     return user;

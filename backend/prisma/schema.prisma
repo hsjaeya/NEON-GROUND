@@ -15,6 +15,17 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+  wallets Wallet[]
+}
+
+model Wallet {
+  id       Int        @id @default(autoincrement())
+  userId   Int
+  balance  Decimal
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  user      User      @relation(fields: [userId], references: [id])
 }
 
 
