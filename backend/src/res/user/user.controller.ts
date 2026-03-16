@@ -25,7 +25,7 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Delete('deleteUser')
+  @Delete('me')
   async deleteUser(@Req() req) {
     const userId = req.user.id;
     return this.userService.deleteUser(userId);
