@@ -37,10 +37,4 @@ export class UserController {
     const userId = req.user.id;
     return this.userService.deleteUser(userId);
   }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('user-info')
-  async getUserInfo() {
-    return 'user-info Page';
-  }
 }
