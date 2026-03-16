@@ -2,6 +2,9 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { hash } from 'bcrypt';
 import { create } from 'domain';
+import { promises } from 'dns';
+import { UserResponseDto } from './dto/user.response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UserService {
@@ -38,6 +41,23 @@ export class UserService {
     });
 
     return user;
+  }
+
+  async getUser(userId: number): Promise<UserResponseDto> {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: userId,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        createdAt: true,
+      },
+    });
+
+    return plainToInstance(UserResponseDto, user);
   }
 
   async deleteUser(userId: number) {
