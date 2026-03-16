@@ -1,10 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { hash } from 'bcrypt';
-import { create } from 'domain';
-import { promises } from 'dns';
-import { UserResponseDto } from './dto/user.response.dto';
+import { UserResponseDto } from './dto/user-response.dto';
 import { plainToInstance } from 'class-transformer';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -58,6 +57,21 @@ export class UserService {
     });
 
     return plainToInstance(UserResponseDto, user);
+  }
+
+  async updateUser(userId: number, dto: UpdateUserDto) {
+    const data = { ...dto, updatedAt: new Date() };
+
+    if (dto.password) {
+      data.password = await hash(dto.password, 10);
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data,
+    });
+
+    return { message: '수정이 완료됐습니다.' };
   }
 
   async deleteUser(userId: number) {

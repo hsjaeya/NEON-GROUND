@@ -6,10 +6,12 @@ import {
   UseGuards,
   Delete,
   Req,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -29,6 +31,13 @@ export class UserController {
   async getUser(@Req() req) {
     const userId = req.user.id;
     return this.userService.getUser(userId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('me')
+  async updateUser(@Req() req, @Body() updateUserDto: UpdateUserDto) {
+    const userId = req.user.id;
+    return this.userService.updateUser(userId, updateUserDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
