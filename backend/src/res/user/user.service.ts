@@ -43,6 +43,13 @@ export class UserService {
   async deleteUser(userId: number) {
     await this.prisma.user.update({
       where: { id: userId },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+
+    await this.prisma.wallet.updateMany({
+      where: { userId },
       data: { deletedAt: new Date() },
     });
 
