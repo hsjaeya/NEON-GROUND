@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -21,9 +25,16 @@ export class AuthService {
     }
 
     const isPasswordMatch = await compare(password, user.password);
+    const isDeleted = user.deletedAt;
 
     if (!isPasswordMatch) {
       throw new BadRequestException('비밀번호가 일치하지 않습니다.');
+    }
+
+    if (isDeleted) {
+      throw new UnauthorizedException(
+        '삭제된 사용자 입니다. 관리자에게 문의하세요.',
+      );
     }
 
     // 필요한 사용자 정보만 반환
