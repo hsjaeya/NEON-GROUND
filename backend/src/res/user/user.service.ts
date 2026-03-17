@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { hash } from 'bcrypt';
 import { UserResponseDto } from './dto/user-response.dto';
@@ -42,21 +46,56 @@ export class UserService {
     return user;
   }
 
-  async getUser(userId: number): Promise<UserResponseDto> {
-    const user = await this.prisma.user.findFirst({
-      where: {
-        id: userId,
-        deletedAt: null,
-      },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        createdAt: true,
-      },
-    });
+  async getUser(userId: number) {
+    try {
+      const user = await this.prisma.user.findFirst({
+        where: {
+          id: userId,
+          deletedAt: null,
+        },
+        select: {
+          id: true,
+          email: true,
+          username: true,
+          createdAt: true,
+          updatedAt: true,
+          wallets: {
+            select: {
+              id: true,
+              userId: true,
+              balance: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+            where: {
+              deletedAt: null,
+            },
+          },
+        },
+      });
 
-    return plainToInstance(UserResponseDto, user);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      return {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        wallets: user.wallets.map((wallet) => ({
+          id: wallet.id,
+          userId: wallet.userId,
+          balance: wallet.balance.toString(),
+          createdAt: wallet.createdAt,
+          updatedAt: wallet.updatedAt,
+        })),
+      };
+    } catch (error) {
+      console.error('getUser error:', error);
+      throw error;
+    }
   }
 
   async updateUser(userId: number, dto: UpdateUserDto) {
