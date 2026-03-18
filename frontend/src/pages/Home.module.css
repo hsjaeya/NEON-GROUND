@@ -1,0 +1,519 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap");
+
+/* ───────────────────────────
+   ROOT
+─────────────────────────── */
+.root {
+  min-height: 100vh;
+  width: 100%;
+  background: #030810;
+  font-family: "Share Tech Mono", monospace;
+  color: #c8eeff;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ───────────────────────────
+   OVERLAYS
+─────────────────────────── */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 220, 255, 0.018) 2px,
+    rgba(0, 220, 255, 0.018) 4px
+  );
+}
+
+.dotGrid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    rgba(0, 255, 200, 0.1) 1px,
+    transparent 1px
+  );
+  background-size: 32px 32px;
+}
+
+/* ───────────────────────────
+   HUD
+─────────────────────────── */
+.hud {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 48px;
+  background: rgba(3, 8, 20, 0.92);
+  border-bottom: 1px solid rgba(0, 255, 200, 0.18);
+  backdrop-filter: blur(12px);
+}
+
+.hudLogo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: "Orbitron", monospace;
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 0.3em;
+  color: #ff0090;
+  text-shadow:
+    0 0 12px #ff0090,
+    0 0 30px rgba(255, 0, 144, 0.4);
+}
+
+.hudDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00ffc8;
+  box-shadow:
+    0 0 8px #00ffc8,
+    0 0 18px rgba(0, 255, 200, 0.4);
+  animation: blink 2s ease infinite;
+}
+
+.hudInfo {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.hudStat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  min-width: 150px;
+}
+
+.hudLabel {
+  font-size: 9px;
+  letter-spacing: 0.35em;
+  color: rgba(0, 255, 200, 0.45);
+}
+
+.hudValue {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 14px;
+  color: #00ffc8;
+  text-shadow: 0 0 8px rgba(0, 255, 200, 0.6);
+}
+
+.hudDivider {
+  width: 1px;
+  height: 36px;
+  background: rgba(0, 255, 200, 0.15);
+}
+
+/* ───────────────────────────
+   MAIN
+─────────────────────────── */
+.main {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding: 64px 80px;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ───────────────────────────
+   TITLE
+─────────────────────────── */
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.titleEyebrow {
+  margin: 0;
+  font-size: 10px;
+  letter-spacing: 0.55em;
+  color: rgba(0, 255, 200, 0.4);
+}
+
+.title {
+  margin: 0;
+  font-family: "Orbitron", monospace;
+  font-weight: 900;
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1.05;
+  color: #fff;
+  text-shadow:
+    0 0 20px rgba(255, 255, 255, 0.35),
+    0 0 60px rgba(255, 0, 144, 0.2);
+}
+
+.titleAccent {
+  color: #ff0090;
+  text-shadow:
+    0 0 14px #ff0090,
+    0 0 40px #ff0090,
+    0 0 80px rgba(255, 0, 144, 0.5);
+}
+
+.titleSub {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: rgba(160, 210, 255, 0.35);
+}
+
+/* ───────────────────────────
+   SECTION LABEL
+─────────────────────────── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sectionLabel span {
+  font-size: 9px;
+  letter-spacing: 0.45em;
+  color: rgba(0, 255, 200, 0.4);
+  white-space: nowrap;
+}
+
+.sectionLine {
+  flex: 1;
+  height: 1px;
+  background: rgba(0, 255, 200, 0.12);
+}
+
+/* ───────────────────────────
+   GAME CARDS
+─────────────────────────── */
+.gameGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.cardLink {
+  text-decoration: none;
+}
+
+.card {
+  position: relative;
+  cursor: pointer;
+  padding: 24px 20px;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(0, 20, 35, 0.7);
+  border: 1px solid rgba(0, 255, 200, 0.2);
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 255, 200, 0.55);
+  background: rgba(0, 28, 48, 0.85);
+}
+
+.card:hover .cardGlow {
+  opacity: 1;
+}
+
+.card:hover .cardArrow {
+  color: #00ffc8;
+  transform: translate(3px, -3px);
+}
+
+.cardFeatured {
+  background: rgba(60, 0, 35, 0.7);
+  border-color: rgba(255, 0, 128, 0.3);
+}
+
+.cardFeatured:hover {
+  border-color: rgba(255, 0, 128, 0.65);
+  background: rgba(75, 0, 45, 0.85);
+}
+
+.cardFeatured:hover .cardGlow {
+  opacity: 1;
+}
+
+.cardFeatured:hover .cardArrow {
+  color: #ff4db3;
+}
+
+/* cut corner - CSS triangle trick */
+.cardCorner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 20px 20px 0;
+  border-color: transparent rgba(0, 255, 200, 0.4) transparent transparent;
+}
+
+.cardFeatured .cardCorner {
+  border-color: transparent rgba(255, 0, 128, 0.45) transparent transparent;
+}
+
+.cardGlow {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    ellipse at top left,
+    rgba(0, 255, 200, 0.07) 0%,
+    transparent 65%
+  );
+}
+
+.cardFeatured .cardGlow {
+  background: radial-gradient(
+    ellipse at top left,
+    rgba(255, 0, 128, 0.07) 0%,
+    transparent 65%
+  );
+}
+
+.cardIcon {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cardName {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  color: #00ffc8;
+  text-shadow: 0 0 10px rgba(0, 255, 200, 0.6);
+}
+
+.cardNameFeatured {
+  color: #ff4db3;
+  text-shadow: 0 0 10px rgba(255, 0, 144, 0.65);
+}
+
+.cardSub {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(160, 220, 255, 0.4);
+}
+
+.cardArrow {
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
+  font-size: 14px;
+  color: rgba(0, 255, 200, 0.35);
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* ───────────────────────────
+   DIVIDER
+─────────────────────────── */
+.divider {
+  position: relative;
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 255, 200, 0.4) 35%,
+    rgba(255, 0, 144, 0.4) 65%,
+    transparent 100%
+  );
+}
+
+.dividerDiamond {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 8px;
+  color: rgba(0, 255, 200, 0.6);
+  background: #030810;
+  padding: 0 10px;
+}
+
+/* ───────────────────────────
+   UTIL BUTTONS
+─────────────────────────── */
+.utilRow {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.utilLink {
+  text-decoration: none;
+}
+
+.utilBtn {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  padding: 12px 28px;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid rgba(180, 220, 255, 0.18);
+  color: rgba(180, 220, 255, 0.55);
+  transition: all 0.2s ease;
+  clip-path: polygon(
+    10px 0%,
+    100% 0%,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    0% 100%,
+    0% 10px
+  );
+}
+
+.utilBtn:hover {
+  border-color: rgba(180, 220, 255, 0.5);
+  color: #c8eeff;
+  background: rgba(180, 220, 255, 0.06);
+}
+
+.utilBtnDanger {
+  border-color: rgba(255, 60, 60, 0.3);
+  color: rgba(255, 100, 100, 0.65);
+}
+
+.utilBtnDanger:hover {
+  border-color: rgba(255, 60, 60, 0.7);
+  color: #ff6868;
+  background: rgba(255, 40, 40, 0.07);
+  text-shadow: 0 0 8px rgba(255, 60, 60, 0.5);
+}
+
+/* ───────────────────────────
+   FOOTER
+─────────────────────────── */
+.footer {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 48px;
+  background: rgba(3, 8, 20, 0.88);
+  border-top: 1px solid rgba(0, 255, 200, 0.1);
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: rgba(0, 255, 200, 0.22);
+}
+
+.pulseBars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 16px;
+}
+
+.pulseBar {
+  display: inline-block;
+  width: 3px;
+  background: rgba(0, 255, 200, 0.45);
+  border-radius: 1px;
+  animation: pulseBar 1.2s ease infinite;
+}
+
+/* ───────────────────────────
+   KEYFRAMES
+─────────────────────────── */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes pulseBar {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ───────────────────────────
+   RESPONSIVE
+─────────────────────────── */
+@media (max-width: 768px) {
+  .hud {
+    padding: 12px 24px;
+  }
+  .main {
+    padding: 40px 24px;
+    gap: 36px;
+  }
+  .gameGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .footer {
+    padding: 12px 24px;
+  }
+  .title {
+    font-size: 36px;
+  }
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
