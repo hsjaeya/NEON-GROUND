@@ -3,6 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+
+const DAILY_BONUS_AMOUNT = 50000;
 import { PrismaService } from 'src/prisma/prisma.service';
 import { hash } from 'bcrypt';
 import { UserResponseDto } from './dto/user-response.dto';
@@ -127,5 +129,56 @@ export class UserService {
     });
 
     return { message: '삭제가 완료됐습니다.' };
+  }
+
+  async getDailyBonusStatus(userId: number) {
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    if (!user.lastDailyBonusAt) return { available: true, nextClaimAt: null };
+
+    const msSince = Date.now() - user.lastDailyBonusAt.getTime();
+    if (msSince >= 24 * 60 * 60 * 1000) return { available: true, nextClaimAt: null };
+
+    const nextClaimAt = new Date(user.lastDailyBonusAt.getTime() + 24 * 60 * 60 * 1000);
+    return { available: false, nextClaimAt };
+  }
+
+  async claimDailyBonus(userId: number) {
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
+      include: { wallets: { where: { deletedAt: null } } },
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    if (user.lastDailyBonusAt) {
+      const msSince = Date.now() - user.lastDailyBonusAt.getTime();
+      if (msSince < 24 * 60 * 60 * 1000) {
+        const nextClaimAt = new Date(user.lastDailyBonusAt.getTime() + 24 * 60 * 60 * 1000);
+        throw new BadRequestException({ message: '이미 오늘의 보너스를 받았습니다.', nextClaimAt });
+      }
+    }
+
+    const wallet = user.wallets[0];
+    if (!wallet) throw new BadRequestException('Wallet not found');
+
+    await this.prisma.$transaction([
+      this.prisma.wallet.update({
+        where: { id: wallet.id },
+        data: { balance: { increment: DAILY_BONUS_AMOUNT } },
+      }),
+      this.prisma.user.update({
+        where: { id: userId },
+        data: { lastDailyBonusAt: new Date() },
+      }),
+    ]);
+
+    const updated = await this.prisma.wallet.findUnique({ where: { id: wallet.id } });
+    return {
+      bonusAmount: DAILY_BONUS_AMOUNT,
+      newBalance: updated?.balance.toString(),
+    };
   }
 }

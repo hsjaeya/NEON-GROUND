@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './res/user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { RouletteModule } from './res/roulette/roulette.module';
+import { GameModule } from './gateway/game.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { RouletteModule } from './res/roulette/roulette.module';
     UserModule,
     AuthModule,
     RouletteModule,
+    GameModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

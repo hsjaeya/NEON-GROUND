@@ -15,8 +15,9 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+  lastDailyBonusAt DateTime?
   wallets Wallet[]
-  rouletteGames RouletteGame[]  
+  rouletteGames RouletteGame[]
 }
 
 model Wallet {

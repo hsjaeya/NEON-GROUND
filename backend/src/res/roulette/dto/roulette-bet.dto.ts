@@ -1,9 +1,10 @@
 import {
   IsArray,
   IsEnum,
-  IsNumber,
+  IsInt,
   IsPositive,
   Min,
+  Max,
   ValidateNested,
   ArrayMinSize,
   ArrayMaxSize,
@@ -30,12 +31,15 @@ export class SingleBetDto {
   @IsArray()
   @ArrayMinSize(1)
   @ArrayMaxSize(36)
-  @IsNumber({}, { each: true })
+  @IsInt({ each: true })
   @Min(0, { each: true })
+  @Max(36, { each: true })
   numbers: number[];
 
-  @IsNumber()
+  @IsInt()
   @IsPositive()
+  @Min(1000)
+  @Max(10000000)
   amount: number;
 }
 
@@ -44,7 +48,7 @@ export class RouletteSpinDto {
   @ValidateNested({ each: true })
   @Type(() => SingleBetDto)
   @ArrayMinSize(1)
-  @ArrayMaxSize(50) // 최대 50개 베팅
+  @ArrayMaxSize(15) // 최대 15개 베팅
   bets: SingleBetDto[];
 }
 

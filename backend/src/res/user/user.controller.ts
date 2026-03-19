@@ -46,4 +46,16 @@ export class UserController {
     const userId = req.user.id;
     return this.userService.deleteUser(userId);
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('daily-bonus')
+  async getDailyBonusStatus(@Req() req) {
+    return this.userService.getDailyBonusStatus(req.user.id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('daily-bonus')
+  async claimDailyBonus(@Req() req) {
+    return this.userService.claimDailyBonus(req.user.id);
+  }
 }
