@@ -16,6 +16,7 @@ model User {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
   wallets Wallet[]
+  rouletteGames RouletteGame[]  
 }
 
 model Wallet {
@@ -26,6 +27,39 @@ model Wallet {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
   user      User      @relation(fields: [userId], references: [id])
+}
+
+model RouletteGame {
+  id            Int           @id @default(autoincrement())
+  userId        Int
+  user          User          @relation(fields: [userId], references: [id])
+  
+  totalBet      Decimal       @db.Decimal(20, 8)
+  totalWin      Decimal       @db.Decimal(20, 8)
+  result        Int           // 당첨 숫자 (0-36)
+  
+  bets          RouletteBet[]
+  
+  createdAt     DateTime      @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model RouletteBet {
+  id            Int          @id @default(autoincrement())
+  gameId        Int
+  game          RouletteGame @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  
+  type          String       // straight, split, street, corner, dozen, column, redblack, evenodd, lowhigh
+  numbers       String       // JSON array: "[1,2,3]"
+  amount        Decimal      @db.Decimal(20, 8)
+  won           Boolean      // 승리 여부
+  payout        Decimal      @db.Decimal(20, 8) // 배당금
+  
+  createdAt     DateTime     @default(now())
+  
+  @@index([gameId])
 }
 
 

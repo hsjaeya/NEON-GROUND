@@ -5,6 +5,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './res/user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { RouletteModule } from './res/roulette/roulette.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     UserModule,
     AuthModule,
+    RouletteModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
