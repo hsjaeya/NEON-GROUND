@@ -1,0 +1,328 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap");
+
+/* Rules Button */
+.rulesBtn {
+  position: fixed;
+  bottom: 28px;
+  right: 20px;
+  z-index: 100;
+  font-family: "Share Tech Mono", monospace;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  padding: 12px 20px;
+  background: rgba(0, 255, 200, 0.15);
+  border: 1px solid rgba(0, 255, 200, 0.4);
+  color: #00ffc8;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.rulesBtn:hover {
+  background: rgba(0, 255, 200, 0.25);
+  border-color: #00ffc8;
+  box-shadow: 0 0 20px rgba(0, 255, 200, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal */
+.modal {
+  position: relative;
+  background: #030810;
+  border: 2px solid rgba(0, 255, 200, 0.3);
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 0 60px rgba(0, 255, 200, 0.3);
+  animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Close Button */
+.closeBtn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 24px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 100, 100, 0.6);
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.closeBtn:hover {
+  color: #ff6868;
+  transform: rotate(90deg);
+}
+
+/* Content */
+.content {
+  padding: 40px;
+  font-family: "Share Tech Mono", monospace;
+  color: #c8eeff;
+}
+
+.title {
+  font-family: "Orbitron", monospace;
+  font-weight: 900;
+  font-size: 32px;
+  color: #00ffc8;
+  margin: 0 0 30px 0;
+  text-align: center;
+  text-shadow: 0 0 20px rgba(0, 255, 200, 0.6);
+}
+
+/* Sections */
+.section {
+  margin-bottom: 32px;
+  padding: 24px;
+  background: rgba(0, 20, 35, 0.5);
+  border-left: 3px solid rgba(0, 255, 200, 0.4);
+}
+
+.sectionTitle {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 18px;
+  color: #ff0090;
+  margin: 0 0 16px 0;
+  text-shadow: 0 0 10px rgba(255, 0, 144, 0.5);
+}
+
+.text {
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0;
+  color: rgba(200, 238, 255, 0.85);
+}
+
+/* Bet Types */
+.betType {
+  margin: 16px 0;
+  padding: 16px;
+  background: rgba(0, 28, 48, 0.6);
+  border: 1px solid rgba(0, 255, 200, 0.2);
+  transition: all 0.2s ease;
+}
+
+.betType:hover {
+  border-color: rgba(0, 255, 200, 0.4);
+  background: rgba(0, 28, 48, 0.8);
+}
+
+.betHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.betName {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 14px;
+  color: #00ffc8;
+  letter-spacing: 0.05em;
+}
+
+.betPayout {
+  font-family: "Orbitron", monospace;
+  font-weight: 900;
+  font-size: 16px;
+  color: #ff0090;
+  background: rgba(255, 0, 144, 0.1);
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 0, 144, 0.3);
+}
+
+.betDesc {
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0;
+  color: rgba(200, 238, 255, 0.7);
+}
+
+.betDesc strong {
+  color: #00ffc8;
+  font-weight: normal;
+}
+
+/* Lists */
+.tipsList,
+.stepsList,
+.warningList {
+  margin: 12px 0;
+  padding-left: 20px;
+}
+
+.tipsList li,
+.stepsList li,
+.warningList li {
+  font-size: 13px;
+  line-height: 1.8;
+  margin: 8px 0;
+  color: rgba(200, 238, 255, 0.8);
+}
+
+.stepsList {
+  list-style: none;
+  padding-left: 0;
+}
+
+.stepsList li {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0, 255, 200, 0.1);
+}
+
+.stepsList li:last-child {
+  border-bottom: none;
+}
+
+.stepsList strong {
+  color: #ff0090;
+  font-weight: normal;
+}
+
+/* Warning Section */
+.warningSection {
+  margin-bottom: 24px;
+  padding: 24px;
+  background: rgba(60, 0, 35, 0.4);
+  border-left: 3px solid rgba(255, 0, 144, 0.5);
+}
+
+.warningTitle {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 18px;
+  color: #ff6868;
+  margin: 0 0 16px 0;
+  text-shadow: 0 0 10px rgba(255, 100, 100, 0.5);
+}
+
+.warningList li {
+  color: rgba(255, 180, 180, 0.8);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  margin-top: 32px;
+}
+
+.startBtn {
+  font-family: "Orbitron", monospace;
+  font-weight: 900;
+  font-size: 16px;
+  letter-spacing: 0.2em;
+  padding: 16px 48px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 0, 144, 0.3),
+    rgba(0, 255, 200, 0.3)
+  );
+  border: 2px solid #00ffc8;
+  color: #00ffc8;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 255, 200, 0.3);
+  text-shadow: 0 0 10px rgba(0, 255, 200, 0.6);
+}
+
+.startBtn:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 0, 144, 0.5),
+    rgba(0, 255, 200, 0.5)
+  );
+  box-shadow: 0 0 40px rgba(0, 255, 200, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Scrollbar */
+.modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal::-webkit-scrollbar-track {
+  background: rgba(0, 20, 35, 0.5);
+}
+
+.modal::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 200, 0.3);
+  border-radius: 4px;
+}
+
+.modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 200, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content {
+    padding: 24px 20px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .sectionTitle {
+    font-size: 16px;
+  }
+
+  .betHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .rulesBtn {
+    bottom: 20px;
+    right: 10px;
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+}

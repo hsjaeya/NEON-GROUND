@@ -95,7 +95,7 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 3px;
-  min-width: 150px;
+  /* min-width: 150px; */
 }
 
 .hudLabel {
@@ -424,6 +424,37 @@
   color: #ff6868;
   background: rgba(255, 40, 40, 0.07);
   text-shadow: 0 0 8px rgba(255, 60, 60, 0.5);
+}
+
+/* ───────────────────────────
+   DAILY BONUS
+─────────────────────────── */
+.dailyBonusBtn {
+  border-color: rgba(255, 200, 0, 0.5) !important;
+  color: #ffcc00 !important;
+  background: rgba(255, 200, 0, 0.08) !important;
+  animation: bonusPulse 2s ease infinite;
+}
+
+.dailyBonusBtn:hover {
+  background: rgba(255, 200, 0, 0.18) !important;
+  border-color: #ffcc00 !important;
+  box-shadow: 0 0 20px rgba(255, 200, 0, 0.35) !important;
+}
+
+.dailyBonusCooldown {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  padding: 12px 20px;
+  color: rgba(0, 255, 200, 0.35);
+  border: 1px solid rgba(0, 255, 200, 0.1);
+}
+
+@keyframes bonusPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(255, 200, 0, 0.2); }
+  50%       { box-shadow: 0 0 24px rgba(255, 200, 0, 0.5); }
 }
 
 /* ───────────────────────────

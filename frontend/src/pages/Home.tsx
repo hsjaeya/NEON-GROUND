@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/Authcontext";
 import styles from "./Home.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Game = {
   to: string;
@@ -111,17 +111,71 @@ function UtilButton({ label, danger = false, onClick, to }: Util) {
 export default function Home() {
   const { user, logout, refreshUser } = useAuth();
   const navigate = useNavigate();
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+  const [dailyBonus, setDailyBonus] = useState<{ available: boolean; nextClaimAt: string | null } | null>(null);
+  const [bonusCountdown, setBonusCountdown] = useState("");
+  const [claimingBonus, setClaimingBonus] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      refreshUser();
+      fetchDailyBonusStatus();
+    }
+  }, []);
+
+  // Countdown timer
+  useEffect(() => {
+    if (!dailyBonus?.nextClaimAt) return;
+    const tick = () => {
+      const diff = new Date(dailyBonus.nextClaimAt!).getTime() - Date.now();
+      if (diff <= 0) { setDailyBonus({ available: true, nextClaimAt: null }); return; }
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      setBonusCountdown(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [dailyBonus?.nextClaimAt]);
+
+  const fetchDailyBonusStatus = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    try {
+      const res = await fetch("http://localhost:3000/user/daily-bonus", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) setDailyBonus(await res.json());
+    } catch {}
+  };
+
+  const handleClaimBonus = async () => {
+    const token = localStorage.getItem("token");
+    if (!token || claimingBonus) return;
+    setClaimingBonus(true);
+    try {
+      const res = await fetch("http://localhost:3000/user/daily-bonus", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        await refreshUser();
+        setDailyBonus({
+          available: false,
+          nextClaimAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        });
+        alert(`💰 일일 보너스 ₩${Number(data.bonusAmount).toLocaleString()} 지급 완료!`);
+      }
+    } catch {} finally {
+      setClaimingBonus(false);
+    }
+  };
 
   const handleLogout = () => {
     logout();
     navigate("/");
-  };
-
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    await refreshUser();
-    setIsRefreshing(false);
   };
 
   // 로그인 안 됨 - Landing 화면
@@ -139,11 +193,6 @@ export default function Home() {
           </div>
           <div className={styles.hudInfo}>
             {/* Dummy spacer to maintain header height */}
-            <div className={styles.hudStat}>
-              <span className={styles.hudLabel}>&nbsp;</span>
-              <span className={styles.hudValue}>&nbsp;</span>
-            </div>
-            <div className={styles.hudDivider} />
             <div className={styles.hudStat}>
               <span className={styles.hudLabel}>&nbsp;</span>
               <span className={styles.hudValue}>&nbsp;</span>
@@ -221,7 +270,7 @@ export default function Home() {
 
   // 로그인 됨 - Game Hub 화면
   const UTILS: Util[] = [
-    { to: "/Ranking", label: "RAKING" },
+    { to: "/ranking", label: "RANKING" },
     { to: "/setting", label: "SETTINGS" },
     { label: "LOGOUT", danger: true, onClick: handleLogout },
   ];
@@ -247,45 +296,9 @@ export default function Home() {
           <div className={styles.hudDivider} />
           <div className={styles.hudStat}>
             <span className={styles.hudLabel}>BALANCE</span>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                minWidth: "140px",
-              }}
-            >
-              <span
-                className={styles.hudValue}
-                style={{ flex: 1, textAlign: "right" }}
-              >
-                ₩ {parseFloat(String(user.balance || 0)).toLocaleString()}
-              </span>
-              <button
-                onClick={handleRefresh}
-                disabled={isRefreshing}
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: isRefreshing ? "not-allowed" : "pointer",
-                  fontSize: "14px",
-                  color: isRefreshing
-                    ? "rgba(0, 255, 200, 0.3)"
-                    : "rgba(0, 255, 200, 0.6)",
-                  transition: "all 0.3s ease",
-                  transform: isRefreshing ? "rotate(360deg)" : "rotate(0deg)",
-                  padding: "4px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minWidth: "20px",
-                  flexShrink: 0,
-                }}
-                title="Refresh balance"
-              >
-                ↻
-              </button>
-            </div>
+            <span className={styles.hudValue}>
+              ₩ {parseFloat(String(user.balance || 0)).toLocaleString()}
+            </span>
           </div>
         </div>
       </header>
@@ -324,14 +337,21 @@ export default function Home() {
         <section className={styles.section}>
           <SectionLabel text="SYSTEM" />
           <div className={styles.utilRow}>
+            {dailyBonus?.available ? (
+              <button
+                onClick={handleClaimBonus}
+                disabled={claimingBonus}
+                className={`${styles.utilBtn} ${styles.dailyBonusBtn}`}
+              >
+                {claimingBonus ? "CLAIMING..." : "💰 DAILY BONUS ₩50,000"}
+              </button>
+            ) : dailyBonus && !dailyBonus.available && bonusCountdown ? (
+              <div className={styles.dailyBonusCooldown}>
+                BONUS IN {bonusCountdown}
+              </div>
+            ) : null}
             {UTILS.map(({ to, label, danger, onClick }) => (
-              <UtilButton
-                key={label}
-                to={to}
-                label={label}
-                danger={danger}
-                onClick={onClick}
-              />
+              <UtilButton key={label} to={to} label={label} danger={danger} onClick={onClick} />
             ))}
           </div>
         </section>

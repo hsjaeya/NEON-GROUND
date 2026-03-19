@@ -3,8 +3,10 @@ import type { ReactNode } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/Authcontext";
 import Home from "./pages/Home";
-import Login from "./pages/login";
+import Login from "./pages/Login";
 import Register from "./pages/Resister";
+import MakeMoney from "./pages/Makemoney";
+import Roulette from "./pages/Roulette";
 
 // import other game pages...
 
@@ -84,6 +86,15 @@ function App(): React.ReactElement {
             }
           />
 
+          <Route
+            path="/roulette"
+            element={
+              <ProtectedRoute>
+                <Roulette />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Protected Game Routes - uncomment as you add games */}
           {/* 
           <Route
@@ -94,14 +105,7 @@ function App(): React.ReactElement {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/roulette"
-            element={
-              <ProtectedRoute>
-                <Roulette />
-              </ProtectedRoute>
-            }
-          />
+
           <Route
             path="/slotMachine"
             element={
@@ -110,6 +114,7 @@ function App(): React.ReactElement {
               </ProtectedRoute>
             }
           />
+          */}
           <Route
             path="/makeMoney"
             element={
@@ -118,6 +123,7 @@ function App(): React.ReactElement {
               </ProtectedRoute>
             }
           />
+          {/* 
           <Route
             path="/donate"
             element={

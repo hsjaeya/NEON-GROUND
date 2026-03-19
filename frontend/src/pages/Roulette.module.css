@@ -1,0 +1,1498 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap");
+
+/* ───────────────────────────
+   ROOT
+─────────────────────────── */
+.root {
+  height: 100vh;
+  width: 100%;
+  background: #030810;
+  font-family: "Share Tech Mono", monospace;
+  color: #c8eeff;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ───────────────────────────
+   OVERLAYS
+─────────────────────────── */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 220, 255, 0.018) 2px,
+    rgba(0, 220, 255, 0.018) 4px
+  );
+}
+
+.dotGrid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    rgba(0, 255, 200, 0.1) 1px,
+    transparent 1px
+  );
+  background-size: 32px 32px;
+}
+
+/* ───────────────────────────
+   HEADER
+─────────────────────────── */
+.header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 48px;
+  background: rgba(3, 8, 20, 0.92);
+  border-bottom: 1px solid rgba(0, 255, 200, 0.18);
+  backdrop-filter: blur(12px);
+}
+
+.backBtn {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  padding: 10px 24px;
+  background: transparent;
+  border: 1px solid rgba(0, 255, 200, 0.3);
+  color: #00ffc8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.backBtn:hover {
+  background: rgba(0, 255, 200, 0.1);
+  border-color: rgba(0, 255, 200, 0.6);
+  box-shadow: 0 0 12px rgba(0, 255, 200, 0.3);
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: "Orbitron", monospace;
+  font-weight: 900;
+  font-size: 16px;
+  letter-spacing: 0.3em;
+  color: #ff0090;
+  text-shadow:
+    0 0 12px #ff0090,
+    0 0 30px rgba(255, 0, 144, 0.4);
+}
+
+.headerIcon {
+  font-size: 24px;
+}
+
+.headerBalance {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.balanceLabel {
+  font-size: 9px;
+  letter-spacing: 0.35em;
+  color: rgba(0, 255, 200, 0.45);
+}
+
+.balanceValue {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 14px;
+  color: #00ffc8;
+  text-shadow: 0 0 8px rgba(0, 255, 200, 0.6);
+}
+
+/* ───────────────────────────
+   MAIN
+─────────────────────────── */
+.main {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  min-height: 0; /* critical: allows flex child to shrink */
+  display: grid;
+  grid-template-columns: 1fr 1fr 280px;
+  grid-template-rows: 1fr;
+  gap: 32px;
+  padding: 24px 48px;
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* ───────────────────────────
+   WHEEL SECTION
+─────────────────────────── */
+.wheelSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+}
+
+.wheelContainer {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wheelArrow {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 32px;
+  color: #ff0090;
+  text-shadow: 0 0 16px #ff0090;
+  z-index: 20;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+}
+
+.wheel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(20, 20, 30, 0.95) 0%,
+    rgba(10, 10, 20, 0.98) 100%
+  );
+  border: 4px solid rgba(0, 255, 200, 0.4);
+  box-shadow:
+    0 0 20px rgba(0, 255, 200, 0.3),
+    0 0 40px rgba(255, 0, 144, 0.2),
+    inset 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+.wheelSlot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 11px;
+  transform-origin: 0 0;
+  color: white;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+.slotRed {
+  color: #fff;
+  text-shadow:
+    0 0 8px #ff0055,
+    0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+.slotBlack {
+  color: #fff;
+  text-shadow:
+    0 0 8px #00ffc8,
+    0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+.slotGreen {
+  color: #00ff88;
+  text-shadow:
+    0 0 12px #00ff88,
+    0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+.wheelCenter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 0, 144, 0.4) 0%,
+    rgba(0, 255, 200, 0.2) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+.wheelCenterRing {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 255, 200, 0.6);
+  box-shadow:
+    0 0 16px rgba(0, 255, 200, 0.4),
+    inset 0 0 16px rgba(255, 0, 144, 0.3);
+}
+
+/* ───────────────────────────
+   RESULT BOX
+─────────────────────────── */
+.resultBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 32px;
+  background: rgba(0, 20, 35, 0.8);
+  border: 1px solid rgba(0, 255, 200, 0.3);
+  backdrop-filter: blur(8px);
+  animation: slideIn 0.4s ease;
+}
+
+.resultLabel {
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: rgba(0, 255, 200, 0.5);
+}
+
+.resultNumber {
+  font-family: "Orbitron", monospace;
+  font-weight: 900;
+  font-size: 48px;
+  padding: 16px 28px;
+  border-radius: 8px;
+  min-width: 100px;
+  text-align: center;
+}
+
+.resultRed {
+  background: rgba(255, 0, 80, 0.2);
+  color: #ff0055;
+  border: 2px solid #ff0055;
+  text-shadow: 0 0 20px #ff0055;
+  box-shadow: 0 0 30px rgba(255, 0, 80, 0.4);
+}
+
+.resultBlack {
+  background: rgba(0, 255, 200, 0.15);
+  color: #00ffc8;
+  border: 2px solid #00ffc8;
+  text-shadow: 0 0 20px #00ffc8;
+  box-shadow: 0 0 30px rgba(0, 255, 200, 0.4);
+}
+
+.resultGreen {
+  background: rgba(0, 255, 136, 0.2);
+  color: #00ff88;
+  border: 2px solid #00ff88;
+  text-shadow: 0 0 20px #00ff88;
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
+}
+
+.winAmountBox {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 18px;
+  color: #00ff88;
+  text-shadow: 0 0 12px #00ff88;
+  animation: pulse 0.6s ease infinite;
+}
+
+.loseBox {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 18px;
+  color: #ff0055;
+  text-shadow: 0 0 12px #ff0055;
+}
+
+/* ───────────────────────────
+   HISTORY
+─────────────────────────── */
+.historyBox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 20px;
+  background: rgba(0, 20, 35, 0.6);
+  border: 1px solid rgba(0, 255, 200, 0.15);
+  width: 100%;
+  max-width: 400px;
+}
+
+.historyLabel {
+  font-size: 9px;
+  letter-spacing: 0.4em;
+  color: rgba(0, 255, 200, 0.4);
+}
+
+.historyNumbers {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.historyNum {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  min-width: 32px;
+  text-align: center;
+}
+
+.historyRed {
+  background: rgba(255, 0, 80, 0.2);
+  color: #ff0055;
+  border: 1px solid rgba(255, 0, 80, 0.4);
+}
+
+.historyBlack {
+  background: rgba(0, 255, 200, 0.1);
+  color: #00ffc8;
+  border: 1px solid rgba(0, 255, 200, 0.3);
+}
+
+.historyGreen {
+  background: rgba(0, 255, 136, 0.15);
+  color: #00ff88;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+/* ───────────────────────────
+   BETTING SECTION
+─────────────────────────── */
+.bettingSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  min-width: 0; /* allow grid column to shrink */
+  padding-right: 4px;
+}
+
+.sectionLabel {
+  font-size: 9px;
+  letter-spacing: 0.45em;
+  color: rgba(0, 255, 200, 0.4);
+  margin-bottom: 8px;
+}
+
+/* ───────────────────────────
+   CHIP SELECTOR
+─────────────────────────── */
+.chipSelector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 12px 20px;
+  background: rgba(0, 20, 35, 0.7);
+  border: 1px solid rgba(0, 255, 200, 0.25);
+  color: #00ffc8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.chip:hover {
+  border-color: rgba(0, 255, 200, 0.5);
+  background: rgba(0, 28, 48, 0.8);
+  box-shadow: 0 0 12px rgba(0, 255, 200, 0.3);
+}
+
+.chip:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.chipActive {
+  background: rgba(0, 255, 200, 0.2);
+  border-color: #00ffc8;
+  box-shadow: 0 0 16px rgba(0, 255, 200, 0.4);
+}
+
+/* ───────────────────────────
+   BETTING TABLE
+─────────────────────────── */
+.bettingTable {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ───────────────────────────
+   BETTING TABLE
+─────────────────────────── */
+.bettingTable {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tableLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Top row: [0 cell] + [number grid + 2:1] */
+.topRow {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+/* 0번 섹션 */
+.zeroSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.zeroCell {
+  min-height: 110px !important;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px !important;
+  padding: 12px 8px !important;
+  width: 32px;
+}
+
+/* 메인 그리드 */
+.mainGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.numbersArea {
+  display: flex;
+  gap: 4px;
+}
+
+.numberColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.numberCell {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 8px 4px;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  position: relative;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.numberCell span {
+  position: relative;
+  z-index: 2;
+}
+
+.cellRed {
+  background: rgba(255, 0, 80, 0.15);
+  color: #ff0055;
+  border-color: rgba(255, 0, 80, 0.3);
+}
+
+.cellRed:hover {
+  background: rgba(255, 0, 80, 0.3);
+  border-color: #ff0055;
+  box-shadow: 0 0 16px rgba(255, 0, 80, 0.4);
+}
+
+.cellBlack {
+  background: rgba(0, 255, 200, 0.08);
+  color: #00ffc8;
+  border-color: rgba(0, 255, 200, 0.2);
+}
+
+.cellBlack:hover {
+  background: rgba(0, 255, 200, 0.18);
+  border-color: #00ffc8;
+  box-shadow: 0 0 16px rgba(0, 255, 200, 0.4);
+}
+
+.cellGreen {
+  background: rgba(0, 255, 136, 0.12);
+  color: #00ff88;
+  border-color: rgba(0, 255, 136, 0.3);
+}
+
+.cellGreen:hover {
+  background: rgba(0, 255, 136, 0.25);
+  border-color: #00ff88;
+  box-shadow: 0 0 16px rgba(0, 255, 136, 0.4);
+}
+
+/* Column Bets Area */
+.columnBetsArea {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.columnBtn {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  padding: 8px 4px;
+  background: rgba(0, 20, 35, 0.7);
+  border: 1px solid rgba(180, 220, 255, 0.2);
+  color: rgba(180, 220, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+  min-height: 34px;
+  white-space: nowrap;
+}
+
+.columnBtn:hover:not(:disabled) {
+  border-color: rgba(180, 220, 255, 0.5);
+  background: rgba(0, 28, 48, 0.8);
+  color: #c8eeff;
+  box-shadow: 0 0 12px rgba(180, 220, 255, 0.3);
+}
+
+.columnBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Outside Bets Area */
+.outsideArea {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dozenBets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.dozenBtn {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  padding: 9px 6px;
+  background: rgba(0, 20, 35, 0.7);
+  border: 1px solid rgba(180, 220, 255, 0.2);
+  color: rgba(180, 220, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dozenBtn:hover:not(:disabled) {
+  border-color: rgba(180, 220, 255, 0.5);
+  background: rgba(0, 28, 48, 0.8);
+  color: #c8eeff;
+  box-shadow: 0 0 12px rgba(180, 220, 255, 0.3);
+}
+
+.dozenBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.evenMoneyBets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+/* ───────────────────────────
+   OUTSIDE BETS
+─────────────────────────── */
+.outsideBets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.outsideBtn {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding: 9px 4px;
+  background: rgba(0, 20, 35, 0.7);
+  border: 1px solid rgba(180, 220, 255, 0.2);
+  color: rgba(180, 220, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.outsideBtn:hover {
+  border-color: rgba(180, 220, 255, 0.5);
+  background: rgba(0, 28, 48, 0.8);
+  color: #c8eeff;
+  box-shadow: 0 0 12px rgba(180, 220, 255, 0.3);
+}
+
+.outsideBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.outsideBtnRed {
+  background: rgba(255, 0, 80, 0.15);
+  border-color: rgba(255, 0, 80, 0.3);
+  color: #ff0055;
+}
+
+.outsideBtnRed:hover {
+  background: rgba(255, 0, 80, 0.3);
+  border-color: #ff0055;
+  box-shadow: 0 0 16px rgba(255, 0, 80, 0.4);
+}
+
+.outsideBtnBlack {
+  background: rgba(0, 255, 200, 0.08);
+  border-color: rgba(0, 255, 200, 0.2);
+  color: #00ffc8;
+}
+
+.outsideBtnBlack:hover {
+  background: rgba(0, 255, 200, 0.18);
+  border-color: #00ffc8;
+  box-shadow: 0 0 16px rgba(0, 255, 200, 0.4);
+}
+
+/* ───────────────────────────
+   CURRENT BETS
+─────────────────────────── */
+.currentBets {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 240px;
+}
+
+.noBets {
+  padding: 20px;
+  text-align: center;
+  color: rgba(160, 220, 255, 0.3);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+}
+
+.betsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  max-height: 160px;
+  padding-right: 8px;
+}
+
+.betItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(0, 20, 35, 0.6);
+  border: 1px solid rgba(0, 255, 200, 0.15);
+  transition: all 0.2s ease;
+}
+
+.betItem:hover {
+  background: rgba(0, 28, 48, 0.7);
+  border-color: rgba(0, 255, 200, 0.3);
+}
+
+.betInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.betName {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 11px;
+  color: #00ffc8;
+  letter-spacing: 0.1em;
+}
+
+.betAmount {
+  font-size: 10px;
+  color: rgba(160, 220, 255, 0.5);
+}
+
+.removeBetBtn {
+  font-size: 16px;
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 60, 60, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.removeBetBtn:hover {
+  color: #ff3c3c;
+  text-shadow: 0 0 8px rgba(255, 60, 60, 0.6);
+}
+
+.removeBetBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.totalBet {
+  padding: 12px 14px;
+  background: rgba(0, 255, 200, 0.08);
+  border: 1px solid rgba(0, 255, 200, 0.3);
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 13px;
+  color: #00ffc8;
+  text-align: center;
+  letter-spacing: 0.15em;
+}
+
+/* ───────────────────────────
+   ACTIONS
+─────────────────────────── */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  gap: 12px;
+}
+
+.clearBtn {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  padding: 16px 20px;
+  background: transparent;
+  border: 1px solid rgba(255, 60, 60, 0.3);
+  color: rgba(255, 100, 100, 0.65);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clearBtn:hover:not(:disabled) {
+  border-color: rgba(255, 60, 60, 0.7);
+  color: #ff6868;
+  background: rgba(255, 40, 40, 0.07);
+  text-shadow: 0 0 8px rgba(255, 60, 60, 0.5);
+}
+
+.clearBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.spinBtn {
+  font-family: "Orbitron", monospace;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 0.3em;
+  padding: 16px 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 0, 144, 0.3),
+    rgba(0, 255, 200, 0.3)
+  );
+  border: 2px solid rgba(0, 255, 200, 0.5);
+  color: #00ffc8;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 255, 200, 0.3);
+  text-shadow: 0 0 10px rgba(0, 255, 200, 0.6);
+}
+
+.spinBtn:hover:not(:disabled) {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 0, 144, 0.5),
+    rgba(0, 255, 200, 0.5)
+  );
+  border-color: #00ffc8;
+  box-shadow: 0 0 30px rgba(0, 255, 200, 0.5);
+  transform: translateY(-2px);
+}
+
+.spinBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ───────────────────────────
+   SLOT WINNING
+─────────────────────────── */
+.slotWinning {
+  animation: slotPop 0.4s ease;
+  filter: brightness(2.5) drop-shadow(0 0 8px #fff);
+  z-index: 5;
+}
+
+/* ───────────────────────────
+   SESSION BAR
+─────────────────────────── */
+.sessionBar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 48px;
+  background: rgba(0, 10, 20, 0.85);
+  border-bottom: 1px solid rgba(0, 255, 200, 0.1);
+  flex-wrap: wrap;
+}
+
+.sessionStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.sessionLabel {
+  font-size: 8px;
+  letter-spacing: 0.35em;
+  color: rgba(0, 255, 200, 0.35);
+}
+
+.sessionValue {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 13px;
+  color: #c8eeff;
+}
+
+.sessionProfit { color: #00ff88; text-shadow: 0 0 8px rgba(0, 255, 136, 0.6); }
+.sessionLoss   { color: #ff3366; text-shadow: 0 0 8px rgba(255, 51, 102, 0.6); }
+
+.sessionDivider {
+  width: 1px;
+  height: 28px;
+  background: rgba(0, 255, 200, 0.12);
+}
+
+.streakBadge {
+  margin-left: auto;
+  padding: 5px 14px;
+  background: rgba(255, 160, 0, 0.15);
+  border: 1px solid rgba(255, 160, 0, 0.4);
+  color: #ffaa00;
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  animation: streakPulse 1.2s ease infinite;
+}
+
+.lossStreakBadge {
+  background: rgba(255, 40, 80, 0.12);
+  border-color: rgba(255, 40, 80, 0.35);
+  color: #ff3366;
+  animation: none;
+}
+
+.autoSpinBadge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 14px;
+  background: rgba(0, 180, 255, 0.1);
+  border: 1px solid rgba(0, 180, 255, 0.35);
+  color: #00ccff;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+.stopAutoBtn {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 10px;
+  padding: 3px 10px;
+  background: rgba(255, 40, 80, 0.2);
+  border: 1px solid rgba(255, 40, 80, 0.5);
+  color: #ff3366;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+}
+
+.stopAutoBtn:hover { background: rgba(255, 40, 80, 0.35); }
+
+/* ───────────────────────────
+   CELEBRATION OVERLAY
+─────────────────────────── */
+.celebrationOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  cursor: pointer;
+  animation: celebFadeIn 0.3s ease;
+}
+
+.celebrationWin {
+  background: rgba(0, 255, 136, 0.08);
+  backdrop-filter: blur(4px);
+}
+
+.celebrationBig {
+  background: rgba(0, 60, 120, 0.65);
+  backdrop-filter: blur(8px);
+}
+
+.celebrationJackpot {
+  background: rgba(60, 30, 0, 0.8);
+  backdrop-filter: blur(12px);
+}
+
+.celebrationEmoji {
+  font-size: 56px;
+  animation: bounce 0.5s ease infinite alternate;
+}
+
+.celebrationTitle {
+  font-family: "Orbitron", monospace;
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  animation: celebGlow 0.8s ease infinite alternate;
+}
+
+.celebrationWin .celebrationTitle    { font-size: 32px; color: #00ff88; text-shadow: 0 0 20px #00ff88; }
+.celebrationBig .celebrationTitle    { font-size: 48px; color: #00ccff; text-shadow: 0 0 30px #00ccff, 0 0 60px rgba(0,200,255,0.5); }
+.celebrationJackpot .celebrationTitle { font-size: 64px; color: #ffaa00; text-shadow: 0 0 40px #ffaa00, 0 0 80px rgba(255,170,0,0.6); }
+
+.celebrationAmount {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+
+.celebrationWin .celebrationAmount    { font-size: 24px; color: #00ff88; }
+.celebrationBig .celebrationAmount    { font-size: 36px; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.6); }
+.celebrationJackpot .celebrationAmount { font-size: 48px; color: #ffdd55; text-shadow: 0 0 30px #ffaa00; }
+
+.celebrationSub {
+  font-size: 13px;
+  letter-spacing: 0.4em;
+  color: rgba(255, 210, 100, 0.7);
+}
+
+/* ───────────────────────────
+   NEAR MISS
+─────────────────────────── */
+.nearMissInline {
+  margin-top: 8px;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: rgba(200, 230, 255, 0.7);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.nearMissNum {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  animation: nearMissPulse 0.6s ease 3;
+}
+
+/* ───────────────────────────
+   HOT NUMBERS
+─────────────────────────── */
+.cellHot {
+  animation: hotGlow 1.5s ease infinite alternate;
+  position: relative;
+}
+
+.hotIndicator {
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  font-size: 9px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.hotLabel {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 160, 0, 0.6);
+  margin-left: 8px;
+}
+
+.historyHot {
+  animation: hotGlow 1.5s ease infinite alternate;
+  box-shadow: 0 0 8px rgba(255, 140, 0, 0.5);
+}
+
+/* ───────────────────────────
+   AUTO SPIN SECTION
+─────────────────────────── */
+.autoSpinSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.autoSpinBtns {
+  display: flex;
+  gap: 8px;
+}
+
+.autoSpinBtn {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 10px 20px;
+  flex: 1;
+  background: rgba(0, 180, 255, 0.08);
+  border: 1px solid rgba(0, 180, 255, 0.25);
+  color: rgba(0, 200, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.15em;
+}
+
+.autoSpinBtn:hover:not(:disabled) {
+  background: rgba(0, 180, 255, 0.18);
+  border-color: rgba(0, 180, 255, 0.6);
+  color: #00ccff;
+  box-shadow: 0 0 12px rgba(0, 180, 255, 0.3);
+}
+
+.autoSpinBtn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ───────────────────────────
+   REBET BUTTON
+─────────────────────────── */
+.rebetBtn {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  padding: 16px 20px;
+  background: rgba(255, 170, 0, 0.08);
+  border: 1px solid rgba(255, 170, 0, 0.3);
+  color: rgba(255, 170, 0, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rebetBtn:hover:not(:disabled) {
+  background: rgba(255, 170, 0, 0.18);
+  border-color: rgba(255, 170, 0, 0.7);
+  color: #ffaa00;
+  box-shadow: 0 0 12px rgba(255, 170, 0, 0.3);
+}
+
+.rebetBtn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ───────────────────────────
+   KEYFRAMES
+─────────────────────────── */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.05); }
+}
+
+@keyframes slotPop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.6); }
+  100% { transform: scale(1); }
+}
+
+@keyframes streakPulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(255, 160, 0, 0.3); }
+  50%       { box-shadow: 0 0 18px rgba(255, 160, 0, 0.7); }
+}
+
+@keyframes celebFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes celebGlow {
+  from { opacity: 0.85; }
+  to   { opacity: 1; filter: brightness(1.3); }
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-12px); }
+}
+
+@keyframes nearMissPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; transform: scale(1.15); }
+}
+
+@keyframes hotGlow {
+  from { filter: brightness(1); }
+  to   { filter: brightness(1.4) drop-shadow(0 0 6px rgba(255, 140, 0, 0.6)); }
+}
+
+/* ───────────────────────────
+   RESPONSIVE
+─────────────────────────── */
+@media (max-width: 1200px) {
+  .root {
+    height: auto;
+    overflow: visible;
+    overflow-x: hidden;
+  }
+
+  .main {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    height: auto;
+    overflow: visible;
+    gap: 32px;
+  }
+
+  .wheelSection {
+    order: 1;
+    height: auto;
+    overflow: visible;
+  }
+
+  .bettingSection {
+    order: 2;
+    height: auto;
+    overflow: visible;
+  }
+
+  .chatSection {
+    order: 3;
+    height: 300px;
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 12px 24px;
+  }
+
+  .main {
+    padding: 32px 24px;
+  }
+
+  .numberGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+  }
+
+  .numberCell {
+    padding: 12px 6px;
+    font-size: 11px;
+  }
+
+  .outsideBets {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .wheelContainer {
+    width: 280px;
+    height: 280px;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Scrollbar */
+.bettingSection::-webkit-scrollbar,
+.betsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.bettingSection::-webkit-scrollbar-track,
+.betsList::-webkit-scrollbar-track {
+  background: rgba(0, 20, 35, 0.3);
+}
+
+.bettingSection::-webkit-scrollbar-thumb,
+.betsList::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 200, 0.3);
+  border-radius: 3px;
+}
+
+.bettingSection::-webkit-scrollbar-thumb:hover,
+.betsList::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 200, 0.5);
+}
+
+/* ───────────────────────────
+   HEADER RIGHT + CONNECTION
+─────────────────────────── */
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.connectionDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ───────────────────────────
+   TIMER
+─────────────────────────── */
+.timerSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 0;
+}
+
+.timerPhase {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+}
+
+.timerDisplay {
+  font-family: "Orbitron", monospace;
+  font-weight: 900;
+  font-size: 48px;
+  line-height: 1;
+  text-shadow: 0 0 20px currentColor;
+}
+
+.timerProgress {
+  width: 100%;
+  max-width: 320px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.timerBar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.9s linear, background 0.3s ease;
+}
+
+.submittedBadge {
+  font-family: "Orbitron", monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: #00ffc8;
+  background: rgba(0, 255, 200, 0.1);
+  border: 1px solid rgba(0, 255, 200, 0.3);
+  padding: 4px 12px;
+}
+
+.submittedLabel {
+  color: #00ffc8;
+  font-size: 10px;
+}
+
+.closedLabel {
+  color: #ff0090;
+  font-size: 10px;
+}
+
+.cellDisabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ───────────────────────────
+   CHAT
+─────────────────────────── */
+.chatSection {
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 10, 20, 0.7);
+  border: 1px solid rgba(0, 255, 200, 0.15);
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.chatHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(0, 255, 200, 0.1);
+  flex-shrink: 0;
+}
+
+.chatTitle {
+  font-family: "Orbitron", monospace;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: #00ffc8;
+}
+
+.chatStatus {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+.chatMessages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chatMessages::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chatMessages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chatMessages::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 200, 0.2);
+  border-radius: 2px;
+}
+
+.chatMessage {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.chatUsername {
+  font-family: "Orbitron", monospace;
+  font-size: 10px;
+  color: #ff0090;
+  letter-spacing: 0.05em;
+}
+
+.chatText {
+  font-size: 12px;
+  color: rgba(200, 238, 255, 0.85);
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.chatInputArea {
+  display: flex;
+  border-top: 1px solid rgba(0, 255, 200, 0.1);
+  flex-shrink: 0;
+}
+
+.chatInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #c8eeff;
+  font-family: "Share Tech Mono", monospace;
+  font-size: 12px;
+  padding: 10px 12px;
+}
+
+.chatInput::placeholder {
+  color: rgba(200, 238, 255, 0.3);
+}
+
+.chatInput:disabled {
+  opacity: 0.4;
+}
+
+.chatSendBtn {
+  background: transparent;
+  border: none;
+  border-left: 1px solid rgba(0, 255, 200, 0.1);
+  color: #00ffc8;
+  font-size: 16px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chatSendBtn:hover:not(:disabled) {
+  background: rgba(0, 255, 200, 0.1);
+}
+
+.chatSendBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
