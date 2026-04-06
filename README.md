@@ -1,6 +1,7 @@
 # NEON-GROUND
 
 온라인 카지노 시뮬레이터. 실제 머니는 사용하지 않습니다.
+🚧 현재 개발 중인 미완성 프로젝트입니다.
 
 **[배포 링크](https://neon-ground.vercel.app)**
 
