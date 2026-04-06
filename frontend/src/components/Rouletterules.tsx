@@ -1,22 +1,51 @@
 import { useState } from "react";
 import styles from "./Rouletterules.module.css";
 
-const STORAGE_KEY = "roulette-rules-hidden";
+const STORAGE_KEY = "roulette-rules-shown";
 
 export default function RouletteRules() {
-  const [isOpen, setIsOpen] = useState(
-    () => localStorage.getItem(STORAGE_KEY) !== "true",
-  );
+  const [isOpen, setIsOpen] = useState(() => {
+    if (localStorage.getItem(STORAGE_KEY) !== "true") {
+      localStorage.setItem(STORAGE_KEY, "true");
+      return true;
+    }
+    return false;
+  });
 
   const closeOnce = () => setIsOpen(false);
 
-  const closeForever = () => {
-    localStorage.setItem(STORAGE_KEY, "true");
-    setIsOpen(false);
-  };
-
   return (
     <>
+      {/* 도움말 버튼 */}
+      <button
+        onClick={() => setIsOpen(true)}
+        style={{
+          position: "fixed",
+          bottom: "40px",
+          left: "24px",
+          zIndex: 100,
+          fontFamily: "'Share Tech Mono', monospace",
+          fontSize: "11px",
+          letterSpacing: "0.2em",
+          color: "rgba(0,255,200,0.7)",
+          background: "rgba(0,10,20,0.85)",
+          border: "1px solid rgba(0,255,200,0.3)",
+          cursor: "pointer",
+          padding: "8px 16px",
+          transition: "all 0.2s",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = "#00ffc8";
+          e.currentTarget.style.borderColor = "rgba(0,255,200,0.7)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = "rgba(0,255,200,0.7)";
+          e.currentTarget.style.borderColor = "rgba(0,255,200,0.3)";
+        }}
+      >
+        ? 도움말
+      </button>
+
       {isOpen && (
         <div className={styles.overlay} onClick={closeOnce}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -207,34 +236,6 @@ export default function RouletteRules() {
               >
                 <button onClick={closeOnce} className={styles.startBtn}>
                   이제 시작하기! 🎰
-                </button>
-                <button
-                  onClick={closeForever}
-                  style={{
-                    fontFamily: "'Share Tech Mono', monospace",
-                    fontSize: "11px",
-                    letterSpacing: "0.15em",
-                    color: "rgba(200, 230, 255, 0.55)",
-                    background: "transparent",
-                    border: "1px solid rgba(200, 230, 255, 0.2)",
-                    cursor: "pointer",
-                    padding: "8px 28px",
-                    transition: "color 0.2s, border-color 0.2s",
-                    appearance: "none",
-                    WebkitAppearance: "none",
-                    outline: "none",
-                    display: "block",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.color = "rgba(200, 230, 255, 0.9)";
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(200, 230, 255, 0.45)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.color = "rgba(200, 230, 255, 0.55)";
-                    (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(200, 230, 255, 0.2)";
-                  }}
-                >
-                  다시 보지 않기
                 </button>
               </div>
             </div>
