@@ -3,6 +3,34 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 type SortKey = 'profit' | 'balance' | 'winrate' | 'games';
 
+const PAGE_SIZE = 10;
+
+const STATS_SELECT = {
+  totalGames: true,
+  totalWins: true,
+  netProfit: true,
+  user: {
+    select: {
+      username: true,
+      wallets: { select: { balance: true }, take: 1, where: { deletedAt: null } },
+    },
+  },
+} as const;
+
+function toRow(s: any, rank: number) {
+  const balance = s.user.wallets[0] ? parseFloat(s.user.wallets[0].balance.toString()) : 0;
+  const winRate = s.totalGames > 0 ? Math.round((s.totalWins / s.totalGames) * 10000) / 100 : 0;
+  return {
+    rank,
+    username: s.user.username,
+    balance,
+    totalGames: s.totalGames,
+    totalWins: s.totalWins,
+    netProfit: parseFloat(s.netProfit.toString()),
+    winRate,
+  };
+}
+
 @Injectable()
 export class RankingService {
   constructor(private prisma: PrismaService) {}
@@ -12,58 +40,53 @@ export class RankingService {
       ? (sort as SortKey)
       : 'profit';
 
-    const PAGE_SIZE = 10;
     const currentPage = Math.max(1, page);
+    const skip = (currentPage - 1) * PAGE_SIZE;
+    const where = { user: { deletedAt: null } };
 
-    const users = await this.prisma.user.findMany({
-      where: { deletedAt: null },
-      select: {
-        id: true,
-        username: true,
-        wallets: { select: { balance: true }, take: 1 },
-        playerStats: {
-          select: {
-            totalGames: true,
-            totalWins: true,
-            totalWagered: true,
-            totalPayout: true,
-            netProfit: true,
-          },
-        },
-      },
+    // profit/games는 DB 레벨에서 정렬·페이징 처리
+    if (validSort === 'profit' || validSort === 'games') {
+      const orderBy = validSort === 'profit'
+        ? { netProfit: 'desc' as const }
+        : { totalGames: 'desc' as const };
+
+      const [total, stats] = await Promise.all([
+        this.prisma.playerStats.count({ where }),
+        this.prisma.playerStats.findMany({
+          where,
+          orderBy,
+          skip,
+          take: PAGE_SIZE,
+          select: STATS_SELECT,
+        }),
+      ]);
+
+      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      const safePage = Math.min(currentPage, totalPages);
+      return {
+        data: stats.map((s, i) => toRow(s, skip + i + 1)),
+        total,
+        page: safePage,
+        totalPages,
+      };
+    }
+
+    // balance/winrate는 계산 필드라 애플리케이션 레벨 정렬
+    const stats = await this.prisma.playerStats.findMany({
+      where,
+      select: STATS_SELECT,
     });
 
-    const rows = users
-      .filter((u) => u.playerStats !== null)
-      .map((u) => {
-        const s = u.playerStats!;
-        const balance = u.wallets[0]
-          ? parseFloat(u.wallets[0].balance.toString())
-          : 0;
-        const totalGames = s.totalGames;
-        const totalWins = s.totalWins;
-        const netProfit = parseFloat(s.netProfit.toString());
-        const winRate =
-          totalGames > 0
-            ? Math.round((totalWins / totalGames) * 10000) / 100
-            : 0;
-        return { username: u.username, balance, totalGames, totalWins, netProfit, winRate };
-      });
-
-    rows.sort((a, b) => {
-      if (validSort === 'profit') return b.netProfit - a.netProfit;
-      if (validSort === 'balance') return b.balance - a.balance;
-      if (validSort === 'winrate') return b.winRate - a.winRate;
-      return b.totalGames - a.totalGames;
-    });
+    const rows = stats.map((s) => toRow(s, 0));
+    rows.sort((a, b) =>
+      validSort === 'balance' ? b.balance - a.balance : b.winRate - a.winRate,
+    );
 
     const total = rows.length;
     const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
     const safePage = Math.min(currentPage, totalPages);
     const start = (safePage - 1) * PAGE_SIZE;
-    const data = rows
-      .slice(start, start + PAGE_SIZE)
-      .map((r, i) => ({ rank: start + i + 1, ...r }));
+    const data = rows.slice(start, start + PAGE_SIZE).map((r, i) => ({ ...r, rank: start + i + 1 }));
 
     return { data, total, page: safePage, totalPages };
   }

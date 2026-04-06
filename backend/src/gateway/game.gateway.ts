@@ -128,25 +128,27 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.broadcastGameState();
     this.server.emit('spinResult', { result, roundId: currentRoundId });
 
-    // Process all pending bets
+    // Process all pending bets in parallel
     const betEntries = Array.from(this.pendingBets.entries());
-    for (const [userId, bets] of betEntries) {
-      try {
-        const betResult = await this.rouletteService.processSpinWithResult(userId, bets, result);
-        if (betResult) {
-          const socketId = this.userSockets.get(userId);
-          if (socketId) {
-            this.server.to(socketId).emit('betResult', {
-              totalWin: betResult.totalWin,
-              newBalance: betResult.newBalance,
-              totalBet: betResult.totalBet,
-            });
+    await Promise.all(
+      betEntries.map(async ([userId, bets]) => {
+        try {
+          const betResult = await this.rouletteService.processSpinWithResult(userId, bets, result);
+          if (betResult) {
+            const socketId = this.userSockets.get(userId);
+            if (socketId) {
+              this.server.to(socketId).emit('betResult', {
+                totalWin: betResult.totalWin,
+                newBalance: betResult.newBalance,
+                totalBet: betResult.totalBet,
+              });
+            }
           }
+        } catch {
+          // Ignore individual bet errors
         }
-      } catch {
-        // Ignore individual bet errors
-      }
-    }
+      }),
+    );
 
     setTimeout(() => {
       this.phase = 'result';
