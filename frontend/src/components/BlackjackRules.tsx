@@ -1,22 +1,51 @@
 import { useState } from "react";
 import styles from "./Rouletterules.module.css";
 
-const STORAGE_KEY = "blackjack-rules-hidden";
+const STORAGE_KEY = "blackjack-rules-shown";
 
 export default function BlackjackRules() {
-  const [isOpen, setIsOpen] = useState(
-    () => localStorage.getItem(STORAGE_KEY) !== "true",
-  );
+  const [isOpen, setIsOpen] = useState(() => {
+    if (localStorage.getItem(STORAGE_KEY) !== "true") {
+      localStorage.setItem(STORAGE_KEY, "true");
+      return true;
+    }
+    return false;
+  });
 
   const closeOnce = () => setIsOpen(false);
 
-  const closeForever = () => {
-    localStorage.setItem(STORAGE_KEY, "true");
-    setIsOpen(false);
-  };
-
   return (
     <>
+      {/* 도움말 버튼 */}
+      <button
+        onClick={() => setIsOpen(true)}
+        style={{
+          position: "fixed",
+          bottom: "40px",
+          right: "24px",
+          zIndex: 100,
+          fontFamily: "'Share Tech Mono', monospace",
+          fontSize: "11px",
+          letterSpacing: "0.2em",
+          color: "rgba(0,255,200,0.7)",
+          background: "rgba(0,10,20,0.85)",
+          border: "1px solid rgba(0,255,200,0.3)",
+          cursor: "pointer",
+          padding: "8px 16px",
+          transition: "all 0.2s",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = "#00ffc8";
+          e.currentTarget.style.borderColor = "rgba(0,255,200,0.7)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = "rgba(0,255,200,0.7)";
+          e.currentTarget.style.borderColor = "rgba(0,255,200,0.3)";
+        }}
+      >
+        ? 도움말
+      </button>
+
       {isOpen && (
         <div className={styles.overlay} onClick={closeOnce}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -45,7 +74,9 @@ export default function BlackjackRules() {
                     <span className={styles.betName}>숫자 카드 (2 ~ 10)</span>
                     <span className={styles.betPayout}>액면가</span>
                   </div>
-                  <p className={styles.betDesc}>카드에 표시된 숫자 그대로 계산됩니다.</p>
+                  <p className={styles.betDesc}>
+                    카드에 표시된 숫자 그대로 계산됩니다.
+                  </p>
                 </div>
 
                 <div className={styles.betType}>
@@ -53,7 +84,9 @@ export default function BlackjackRules() {
                     <span className={styles.betName}>J / Q / K</span>
                     <span className={styles.betPayout}>10</span>
                   </div>
-                  <p className={styles.betDesc}>페이스 카드는 모두 10으로 계산됩니다.</p>
+                  <p className={styles.betDesc}>
+                    페이스 카드는 모두 10으로 계산됩니다.
+                  </p>
                 </div>
 
                 <div className={styles.betType}>
@@ -64,7 +97,8 @@ export default function BlackjackRules() {
                   <p className={styles.betDesc}>
                     패에 유리한 쪽으로 자동 계산됩니다.
                     <br />
-                    <strong>예시:</strong> A + 7 = 18 (11+7), A + 7 + 5 = 13 (1+7+5)
+                    <strong>예시:</strong> A + 7 = 18 (11+7), A + 7 + 5 = 13
+                    (1+7+5)
                   </p>
                 </div>
               </section>
@@ -77,7 +111,9 @@ export default function BlackjackRules() {
                     <span className={styles.betName}>HIT</span>
                     <span className={styles.betPayout}>카드 추가</span>
                   </div>
-                  <p className={styles.betDesc}>카드를 한 장 더 받습니다. 21을 초과하면 즉시 Bust.</p>
+                  <p className={styles.betDesc}>
+                    카드를 한 장 더 받습니다. 21을 초과하면 즉시 Bust.
+                  </p>
                 </div>
 
                 <div className={styles.betType}>
@@ -85,7 +121,9 @@ export default function BlackjackRules() {
                     <span className={styles.betName}>STAND</span>
                     <span className={styles.betPayout}>현재 유지</span>
                   </div>
-                  <p className={styles.betDesc}>현재 패를 유지하고 딜러 차례로 넘깁니다.</p>
+                  <p className={styles.betDesc}>
+                    현재 패를 유지하고 딜러 차례로 넘깁니다.
+                  </p>
                 </div>
 
                 <div className={styles.betType}>
@@ -121,7 +159,9 @@ export default function BlackjackRules() {
                     <span className={styles.betName}>WIN</span>
                     <span className={styles.betPayout}>1배</span>
                   </div>
-                  <p className={styles.betDesc}>딜러보다 높은 점수로 21 이하. 베팅금액만큼 획득.</p>
+                  <p className={styles.betDesc}>
+                    딜러보다 높은 점수로 21 이하. 베팅금액만큼 획득.
+                  </p>
                 </div>
 
                 <div className={styles.betType}>
@@ -129,7 +169,9 @@ export default function BlackjackRules() {
                     <span className={styles.betName}>PUSH (무승부)</span>
                     <span className={styles.betPayout}>반환</span>
                   </div>
-                  <p className={styles.betDesc}>딜러와 동점. 베팅 금액 그대로 반환됩니다.</p>
+                  <p className={styles.betDesc}>
+                    딜러와 동점. 베팅 금액 그대로 반환됩니다.
+                  </p>
                 </div>
 
                 <div className={styles.betType}>
@@ -137,7 +179,9 @@ export default function BlackjackRules() {
                     <span className={styles.betName}>BUST / LOSE</span>
                     <span className={styles.betPayout}>몰수</span>
                   </div>
-                  <p className={styles.betDesc}>21 초과 또는 딜러보다 낮은 점수. 베팅 금액 전액 손실.</p>
+                  <p className={styles.betDesc}>
+                    21 초과 또는 딜러보다 낮은 점수. 베팅 금액 전액 손실.
+                  </p>
                 </div>
               </section>
 
@@ -154,12 +198,25 @@ export default function BlackjackRules() {
               <section className={styles.section}>
                 <h2 className={styles.sectionTitle}>🎮 게임 진행</h2>
                 <ol className={styles.stepsList}>
-                  <li><strong>1단계:</strong> 칩을 클릭해 베팅 금액을 설정합니다</li>
-                  <li><strong>2단계:</strong> DEAL 버튼을 눌러 게임을 시작합니다</li>
-                  <li><strong>3단계:</strong> 플레이어와 딜러 각각 2장씩 카드를 받습니다</li>
-                  <li><strong>4단계:</strong> HIT / STAND / DOUBLE 중 선택합니다</li>
-                  <li><strong>5단계:</strong> 딜러가 자동으로 패를 완성합니다</li>
-                  <li><strong>6단계:</strong> 결과에 따라 자동으로 정산됩니다</li>
+                  <li>
+                    <strong>1단계:</strong> 칩을 클릭해 베팅 금액을 설정합니다
+                  </li>
+                  <li>
+                    <strong>2단계:</strong> DEAL 버튼을 눌러 게임을 시작합니다
+                  </li>
+                  <li>
+                    <strong>3단계:</strong> 플레이어와 딜러 각각 2장씩 카드를
+                    받습니다
+                  </li>
+                  <li>
+                    <strong>4단계:</strong> HIT / STAND / DOUBLE 중 선택합니다
+                  </li>
+                  <li>
+                    <strong>5단계:</strong> 딜러가 자동으로 패를 완성합니다
+                  </li>
+                  <li>
+                    <strong>6단계:</strong> 결과에 따라 자동으로 정산됩니다
+                  </li>
                 </ol>
               </section>
 
@@ -168,7 +225,9 @@ export default function BlackjackRules() {
                 <ul className={styles.warningList}>
                   <li>베팅 금액은 DEAL 시작 시 즉시 차감됩니다</li>
                   <li>Double Down 시 추가 베팅 금액도 잔액에서 차감됩니다</li>
-                  <li>딜러가 블랙잭이면 플레이어 블랙잭과 무승부(PUSH) 처리됩니다</li>
+                  <li>
+                    딜러가 블랙잭이면 플레이어 블랙잭과 무승부(PUSH) 처리됩니다
+                  </li>
                 </ul>
               </section>
 
@@ -183,34 +242,6 @@ export default function BlackjackRules() {
               >
                 <button onClick={closeOnce} className={styles.startBtn}>
                   게임 시작! 🃏
-                </button>
-                <button
-                  onClick={closeForever}
-                  style={{
-                    fontFamily: "'Share Tech Mono', monospace",
-                    fontSize: "11px",
-                    letterSpacing: "0.15em",
-                    color: "rgba(200, 230, 255, 0.55)",
-                    background: "transparent",
-                    border: "1px solid rgba(200, 230, 255, 0.2)",
-                    cursor: "pointer",
-                    padding: "8px 28px",
-                    transition: "color 0.2s, border-color 0.2s",
-                    appearance: "none",
-                    WebkitAppearance: "none",
-                    outline: "none",
-                    display: "block",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = "rgba(200, 230, 255, 0.9)";
-                    e.currentTarget.style.borderColor = "rgba(200, 230, 255, 0.45)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = "rgba(200, 230, 255, 0.55)";
-                    e.currentTarget.style.borderColor = "rgba(200, 230, 255, 0.2)";
-                  }}
-                >
-                  다시 보지 않기
                 </button>
               </div>
             </div>
