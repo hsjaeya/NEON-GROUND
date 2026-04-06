@@ -48,6 +48,12 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Get('profile')
+  async getProfile(@Req() req) {
+    return this.userService.getProfile(req.user.id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Get('daily-bonus')
   async getDailyBonusStatus(@Req() req) {
     return this.userService.getDailyBonusStatus(req.user.id);

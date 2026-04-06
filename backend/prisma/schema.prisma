@@ -18,6 +18,19 @@ model User {
   lastDailyBonusAt DateTime?
   wallets Wallet[]
   rouletteGames RouletteGame[]
+  playerStats PlayerStats?
+}
+
+model PlayerStats {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique
+  user         User     @relation(fields: [userId], references: [id])
+  totalGames   Int      @default(0)
+  totalWins    Int      @default(0)
+  totalWagered Decimal  @default(0) @db.Decimal(20, 2)
+  totalPayout  Decimal  @default(0) @db.Decimal(20, 2)
+  netProfit    Decimal  @default(0) @db.Decimal(20, 2)
+  updatedAt    DateTime @updatedAt
 }
 
 model Wallet {

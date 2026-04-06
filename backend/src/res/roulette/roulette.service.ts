@@ -4,10 +4,14 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RouletteSpinDto, BetType } from './dto/roulette-bet.dto';
 import { Decimal } from '@prisma/client/runtime/client';
+import { StatsService } from '../stats/stats.service';
 
 @Injectable()
 export class RouletteService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private stats: StatsService,
+  ) {}
 
   // 숫자 색상 확인
   private getNumberColor(num: number): 'red' | 'black' | 'green' {
@@ -263,10 +267,14 @@ export class RouletteService {
       throw new BadRequestException('Wallet not found after transaction');
     }
 
+    const totalWinNum = totalWin.toNumber();
+
+    this.stats.recordGame(userId, totalBet, totalWinNum).catch(() => {});
+
     return {
       result,
       totalBet,
-      totalWin: totalWin.toNumber(),
+      totalWin: totalWinNum,
       newBalance: parseFloat(updatedWallet.balance.toString()),
       gameId: gameResult.id,
       bets: betResults,
@@ -332,9 +340,13 @@ export class RouletteService {
     });
 
     const updatedWallet = await this.prisma.wallet.findFirst({ where: { userId } });
+    const totalWinNum = totalWin.toNumber();
+
+    this.stats.recordGame(userId, totalBet, totalWinNum).catch(() => {});
+
     return {
       totalBet,
-      totalWin: totalWin.toNumber(),
+      totalWin: totalWinNum,
       newBalance: parseFloat(updatedWallet!.balance.toString()),
     };
   }

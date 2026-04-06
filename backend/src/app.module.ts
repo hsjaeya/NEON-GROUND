@@ -6,7 +6,9 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './res/user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { RouletteModule } from './res/roulette/roulette.module';
+import { PokerModule } from './res/poker/poker.module';
 import { GameModule } from './gateway/game.module';
+import { RankingModule } from './res/ranking/ranking.module';
 
 @Module({
   imports: [
@@ -16,7 +18,9 @@ import { GameModule } from './gateway/game.module';
     UserModule,
     AuthModule,
     RouletteModule,
+    PokerModule,
     GameModule,
+    RankingModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

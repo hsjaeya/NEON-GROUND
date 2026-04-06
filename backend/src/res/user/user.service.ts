@@ -3,12 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-
-const DAILY_BONUS_AMOUNT = 50000;
+const DAILY_BONUS_AMOUNT = 100000;
 import { PrismaService } from 'src/prisma/prisma.service';
 import { hash } from 'bcrypt';
-import { UserResponseDto } from './dto/user-response.dto';
-import { plainToInstance } from 'class-transformer';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
@@ -101,7 +98,21 @@ export class UserService {
   }
 
   async updateUser(userId: number, dto: UpdateUserDto) {
-    const data = { ...dto, updatedAt: new Date() };
+    if (dto.email) {
+      const emailTaken = await this.prisma.user.findFirst({
+        where: { email: dto.email, id: { not: userId }, deletedAt: null },
+      });
+      if (emailTaken) throw new BadRequestException('이미 사용 중인 이메일입니다.');
+    }
+
+    if (dto.username) {
+      const usernameTaken = await this.prisma.user.findFirst({
+        where: { username: dto.username, id: { not: userId }, deletedAt: null },
+      });
+      if (usernameTaken) throw new BadRequestException('이미 사용 중인 닉네임입니다.');
+    }
+
+    const data: any = { ...dto, updatedAt: new Date() };
 
     if (dto.password) {
       data.password = await hash(dto.password, 10);
@@ -146,6 +157,60 @@ export class UserService {
     return { available: false, nextClaimAt };
   }
 
+  async getProfile(userId: number) {
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        createdAt: true,
+        wallets: { select: { balance: true }, take: 1 },
+        playerStats: {
+          select: {
+            totalGames: true,
+            totalWins: true,
+            totalWagered: true,
+            totalPayout: true,
+            netProfit: true,
+          },
+        },
+      },
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const balance = user.wallets[0]
+      ? parseFloat(user.wallets[0].balance.toString())
+      : 0;
+
+    const stats = user.playerStats
+      ? {
+          totalGames: user.playerStats.totalGames,
+          totalWins: user.playerStats.totalWins,
+          winRate:
+            user.playerStats.totalGames > 0
+              ? Math.round(
+                  (user.playerStats.totalWins / user.playerStats.totalGames) *
+                    10000,
+                ) / 100
+              : 0,
+          netProfit: parseFloat(user.playerStats.netProfit.toString()),
+          totalWagered: parseFloat(user.playerStats.totalWagered.toString()),
+          totalPayout: parseFloat(user.playerStats.totalPayout.toString()),
+        }
+      : null;
+
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      createdAt: user.createdAt,
+      balance,
+      stats,
+    };
+  }
+
   async claimDailyBonus(userId: number) {
     const user = await this.prisma.user.findFirst({
       where: { id: userId, deletedAt: null },
@@ -176,6 +241,7 @@ export class UserService {
     ]);
 
     const updated = await this.prisma.wallet.findUnique({ where: { id: wallet.id } });
+
     return {
       bonusAmount: DAILY_BONUS_AMOUNT,
       newBalance: updated?.balance.toString(),

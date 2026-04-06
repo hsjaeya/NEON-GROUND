@@ -15,7 +15,7 @@ type ChatMsg = { username: string; message: string; timestamp: string };
 
 @WebSocketGateway({
   namespace: '/roulette',
-  cors: { origin: 'http://localhost:5173', credentials: true },
+  cors: { origin: process.env.FRONTEND_URL, credentials: true },
 })
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
@@ -54,6 +54,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       client.emit('gameState', { phase: this.phase, timeLeft: this.timeLeft, roundId: this.roundId });
       if (this.chatHistory.length > 0) client.emit('chatHistory', this.chatHistory);
       if (this.recentResults.length > 0) client.emit('recentResults', this.recentResults);
+
+      // Broadcast updated room users to everyone
+      this.broadcastRoomUsers();
     } catch {
       client.disconnect();
     }
@@ -64,7 +67,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if (user) {
       this.userSockets.delete(user.id);
       this.socketUsers.delete(client.id);
+      this.broadcastRoomUsers();
     }
+  }
+
+  private broadcastRoomUsers() {
+    const users = Array.from(this.socketUsers.values()).map((u) => u.username);
+    this.server.emit('roomUsers', { count: users.length, usernames: users });
   }
 
   @SubscribeMessage('submitBets')
