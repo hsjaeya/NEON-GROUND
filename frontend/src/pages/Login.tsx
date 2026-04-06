@@ -74,7 +74,7 @@ const Login: React.FC = () => {
 
         {/* Header */}
         <div className={styles.authHeader}>
-          <div className={styles.authLogo}>◇ NEON VAULT ◇</div>
+          <div className={styles.authLogo}>◇ NEON GROUND ◇</div>
           <h1 className={styles.authTitle}>
             SYSTEM <span>ACCESS</span>
           </h1>

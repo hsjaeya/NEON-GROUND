@@ -204,7 +204,7 @@ export default function Poker() {
       <header className={styles.hud}>
         <Link to="/" className={styles.hudLogo}>
           <div className={styles.hudDot} />
-          <span>NEON VAULT</span>
+          <span>NEON GROUND</span>
         </Link>
         <div className={styles.hudInfo}>
           <div className={styles.hudStat}>

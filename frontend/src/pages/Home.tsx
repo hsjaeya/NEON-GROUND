@@ -274,7 +274,7 @@ export default function Home() {
         <header className={styles.hud}>
           <div className={styles.hudLogo}>
             <div className={styles.hudDot} />
-            <span>NEON VAULT</span>
+            <span>NEON GROUND</span>
           </div>
           <div className={styles.hudInfo}>
             <div className={styles.hudStat}>
@@ -292,7 +292,7 @@ export default function Home() {
             <h1 className={styles.title}>
               ENTER THE
               <br />
-              <span className={styles.titleAccent}>NEON</span> VAULT
+              <span className={styles.titleAccent}>NEON</span> GROUND
             </h1>
             <p className={styles.titleSub}>
               Try your luck · luck protocol v2.7 · secure access required
@@ -369,7 +369,7 @@ export default function Home() {
       <header className={styles.hud}>
         <div className={styles.hudLogo}>
           <div className={styles.hudDot} />
-          <span>NEON VAULT</span>
+          <span>NEON GROUND</span>
         </div>
         <div className={styles.hudInfo}>
           <div className={styles.hudStat}>

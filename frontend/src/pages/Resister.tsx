@@ -99,7 +99,7 @@ const Register: React.FC = () => {
 
         {/* Header */}
         <div className={styles.authHeader}>
-          <div className={styles.authLogo}>◇ NEON VAULT ◇</div>
+          <div className={styles.authLogo}>◇ NEON GROUND ◇</div>
           <h1 className={styles.authTitle}>
             CREATE <span>ACCOUNT</span>
           </h1>
