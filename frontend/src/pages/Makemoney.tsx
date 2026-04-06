@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "./MakeMoney.module.css";
+import styles from "./Makemoney.module.css";
 
 // ===== Types =====
 interface Fish {
