@@ -1,0 +1,731 @@
+/* ── Root ─────────────────────────────────────────────────────────── */
+.root {
+  min-height: 100vh;
+  background: #050a0f;
+  color: #c8e6ff;
+  font-family: 'Share Tech Mono', monospace;
+  position: relative;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Overlays ─────────────────────────────────────────────────────── */
+.scanlines {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px
+  );
+  z-index: 10;
+}
+.dotGrid {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(0,255,200,0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  z-index: 9;
+}
+
+/* ── Header ───────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 48px;
+  border-bottom: 1px solid rgba(0,255,200,0.18);
+  background: rgba(5,10,15,0.95);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.backBtn {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: rgba(200,230,255,0.6);
+  text-decoration: none;
+  border: 1px solid rgba(200,230,255,0.25);
+  padding: 6px 14px;
+  transition: all 0.2s;
+}
+.backBtn:hover { color: #00ffc8; border-color: #00ffc8; }
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #e0f4ff;
+}
+.headerIcon { color: #00ffc8; font-size: 22px; text-shadow: 0 0 12px rgba(0,255,200,0.7); }
+.headerAccent { color: #00ffc8; text-shadow: 0 0 12px rgba(0,255,200,0.5); }
+.headerSpacer { width: 90px; }
+
+/* ── Main ─────────────────────────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 40px 24px 60px;
+  max-width: 700px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ── Status ───────────────────────────────────────────────────────── */
+.statusMsg {
+  padding: 60px 0;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: rgba(200,230,255,0.3);
+}
+.errorMsg {
+  padding: 60px 0;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #ff4466;
+}
+
+/* ── ID Card ──────────────────────────────────────────────────────── */
+.idCard {
+  width: 100%;
+  background: rgba(5,14,28,0.95);
+  border: 1px solid rgba(0,255,200,0.25);
+  padding: 32px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+  box-shadow:
+    0 0 60px rgba(0,255,200,0.05),
+    inset 0 0 60px rgba(0,255,200,0.02),
+    0 0 0 1px rgba(0,255,200,0.04) inset;
+  overflow: hidden;
+}
+
+/* Scanline overlay on card */
+.idCard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 5px,
+    rgba(0,0,0,0.04) 5px, rgba(0,0,0,0.04) 6px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Radial glow behind avatar area */
+.idCard::after {
+  content: '';
+  position: absolute;
+  top: -30px;
+  left: -30px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(0,255,200,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Corner accents — all 4 */
+.idCornerTL {
+  position: absolute; top: -1px; left: -1px;
+  width: 20px; height: 20px;
+  border-top: 2px solid #00ffc8; border-left: 2px solid #00ffc8;
+  z-index: 2;
+}
+.idCornerTR {
+  position: absolute; top: -1px; right: -1px;
+  width: 20px; height: 20px;
+  border-top: 2px solid #00ffc8; border-right: 2px solid #00ffc8;
+  z-index: 2;
+}
+.idCornerBL {
+  position: absolute; bottom: -1px; left: -1px;
+  width: 20px; height: 20px;
+  border-bottom: 2px solid #00ffc8; border-left: 2px solid #00ffc8;
+  z-index: 2;
+}
+.idCornerBR {
+  position: absolute; bottom: -1px; right: -1px;
+  width: 20px; height: 20px;
+  border-bottom: 2px solid #00ffc8; border-right: 2px solid #00ffc8;
+  z-index: 2;
+}
+
+/* ── ID Top Row ───────────────────────────────────────────────────── */
+.idTopRow {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.idAvatar {
+  flex-shrink: 0;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(0,255,200,0.18), rgba(0,255,200,0.04) 70%);
+  border: 2px solid rgba(0,255,200,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 30px;
+  font-weight: 700;
+  color: #00ffc8;
+  text-shadow: 0 0 20px rgba(0,255,200,0.9), 0 0 40px rgba(0,255,200,0.4);
+  box-shadow:
+    0 0 0 4px rgba(0,255,200,0.06),
+    0 0 30px rgba(0,255,200,0.15),
+    inset 0 0 20px rgba(0,255,200,0.05);
+}
+
+.idInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.idUsername {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 24px;
+  letter-spacing: 3px;
+  color: #e0f4ff;
+  text-shadow: 0 0 20px rgba(200,230,255,0.2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.idEmail {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: rgba(200,230,255,0.4);
+}
+.idMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+.idMetaItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.idMetaLabel {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(0,255,200,0.5);
+}
+.idMetaValue {
+  font-size: 11px;
+  color: rgba(200,230,255,0.65);
+}
+.idMetaDivider { color: rgba(200,230,255,0.2); }
+
+/* ── ID Divider ───────────────────────────────────────────────────── */
+.idDivider {
+  position: relative;
+  z-index: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0,255,200,0.3) 20%,
+    rgba(0,255,200,0.5) 50%,
+    rgba(0,255,200,0.3) 80%,
+    transparent
+  );
+  margin: 0 -4px;
+}
+
+/* ── Balance Row ──────────────────────────────────────────────────── */
+.idBalanceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+.idBalanceLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.idBalanceLabel {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: rgba(0,255,200,0.5);
+}
+.idBalanceValue {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 28px;
+  color: #00ffc8;
+  text-shadow: 0 0 16px rgba(0,255,200,0.6), 0 0 40px rgba(0,255,200,0.2);
+  letter-spacing: 2px;
+}
+.idCardTag {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: rgba(0,255,200,0.3);
+  border: 1px solid rgba(0,255,200,0.15);
+  padding: 4px 10px;
+}
+
+/* ── Section ──────────────────────────────────────────────────────── */
+.section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: rgba(0,255,200,0.5);
+}
+.sectionTitle::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(0,255,200,0.2), transparent);
+}
+
+/* ── Win Rate Bar ─────────────────────────────────────────────────── */
+.winRateWrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(5,14,28,0.85);
+  border: 1px solid rgba(0,255,200,0.12);
+  padding: 16px 18px;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.winRateWrap:hover { border-color: rgba(0,255,200,0.28); }
+
+.winRateWrap::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: linear-gradient(180deg, #00ffc8, rgba(0,255,200,0.2));
+}
+
+.winRateHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.winRateLabel {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(200,230,255,0.4);
+}
+.winRateValue {
+  font-size: 18px;
+  color: #00ffc8;
+  text-shadow: 0 0 8px rgba(0,255,200,0.5);
+}
+.winRateTrack {
+  width: 100%;
+  height: 4px;
+  background: rgba(0,255,200,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.winRateFill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(0,255,200,0.4), #00ffc8);
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(0,255,200,0.4);
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Stats Grid ───────────────────────────────────────────────────── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.statsGrid2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.statBox {
+  background: rgba(5,14,28,0.85);
+  border: 1px solid rgba(0,255,200,0.12);
+  padding: 16px 14px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.statBox:hover {
+  border-color: rgba(0,255,200,0.28);
+  box-shadow: 0 0 20px rgba(0,255,200,0.04);
+}
+.statBox::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: rgba(0,255,200,0.2);
+  transition: background 0.2s;
+}
+.statBox:hover::before { background: rgba(0,255,200,0.4); }
+
+.statBoxPos::before { background: linear-gradient(180deg, #00ffc8, rgba(0,255,200,0.2)); }
+.statBoxNeg::before { background: linear-gradient(180deg, #ff4466, rgba(255,68,102,0.2)); }
+.statBoxCyan::before { background: linear-gradient(180deg, #66d4ff, rgba(102,212,255,0.2)); }
+
+.statLabel {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(200,230,255,0.4);
+}
+.statValue {
+  font-size: 17px;
+  color: rgba(200,230,255,0.85);
+  letter-spacing: 1px;
+}
+.pos  { color: #00ffc8; text-shadow: 0 0 8px rgba(0,255,200,0.4); }
+.neg  { color: #ff4466; text-shadow: 0 0 8px rgba(255,68,102,0.4); }
+.cyan { color: #66d4ff; }
+
+/* ── Net Profit Hero ──────────────────────────────────────────────── */
+.profitHero {
+  width: 100%;
+  background: rgba(5,14,28,0.9);
+  border: 1px solid rgba(0,255,200,0.18);
+  padding: 22px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.profitHero:hover { border-color: rgba(0,255,200,0.35); }
+
+.profitHero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0,255,200,0.6) 50%, transparent);
+}
+.profitHero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(0,255,200,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+.profitHeroNeg::before {
+  background: linear-gradient(90deg, transparent, rgba(255,68,102,0.6) 50%, transparent);
+}
+.profitHeroNeg::after {
+  background: radial-gradient(ellipse at 50% 100%, rgba(255,68,102,0.04) 0%, transparent 70%);
+}
+
+.profitLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  z-index: 1;
+}
+.profitLabel {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: rgba(200,230,255,0.4);
+}
+.profitValue {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 36px;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+.profitValuePos {
+  color: #00ffc8;
+  text-shadow: 0 0 20px rgba(0,255,200,0.5), 0 0 60px rgba(0,255,200,0.15);
+}
+.profitValueNeg {
+  color: #ff4466;
+  text-shadow: 0 0 20px rgba(255,68,102,0.5), 0 0 60px rgba(255,68,102,0.15);
+}
+
+.profitBadge {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.profitBadgeIcon {
+  font-size: 28px;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px rgba(0,255,200,0.4));
+}
+.profitBadgeIconNeg {
+  filter: drop-shadow(0 0 8px rgba(255,68,102,0.4));
+}
+.profitBadgeText {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(200,230,255,0.3);
+}
+
+/* ── No Stats ─────────────────────────────────────────────────────── */
+.noStats {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+  border: 1px solid rgba(0,255,200,0.1);
+  background: rgba(5,14,28,0.7);
+}
+.noStatsIcon {
+  font-size: 32px;
+  color: rgba(0,255,200,0.25);
+}
+.noStatsText {
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: rgba(200,230,255,0.4);
+}
+.noStatsSub {
+  font-size: 11px;
+  color: rgba(200,230,255,0.25);
+}
+.playBtn {
+  margin-top: 8px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #00ffc8;
+  text-decoration: none;
+  border: 1px solid rgba(0,255,200,0.4);
+  padding: 8px 24px;
+  transition: all 0.2s;
+}
+.playBtn:hover {
+  background: rgba(0,255,200,0.08);
+  border-color: #00ffc8;
+  box-shadow: 0 0 16px rgba(0,255,200,0.1);
+}
+
+/* ── Quick Links ──────────────────────────────────────────────────── */
+.links {
+  display: flex;
+  gap: 10px;
+}
+.linkBtn {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(200,230,255,0.5);
+  text-decoration: none;
+  border: 1px solid rgba(200,230,255,0.18);
+  padding: 8px 20px;
+  transition: all 0.2s;
+}
+.linkBtn:hover {
+  color: #00ffc8;
+  border-color: #00ffc8;
+  box-shadow: 0 0 12px rgba(0,255,200,0.08);
+}
+
+/* ── Edit Button ──────────────────────────────────────────────────── */
+.idUsernameRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.editBtn {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(0,255,200,0.6);
+  background: transparent;
+  border: 1px solid rgba(0,255,200,0.25);
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.editBtn:hover {
+  color: #00ffc8;
+  border-color: #00ffc8;
+  box-shadow: 0 0 10px rgba(0,255,200,0.15);
+}
+
+/* ── Success / Error Banners ──────────────────────────────────────── */
+.saveSuccess {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #00ffc8;
+  background: rgba(0,255,200,0.06);
+  border: 1px solid rgba(0,255,200,0.25);
+  padding: 8px 14px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+.saveError {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #ff4466;
+  background: rgba(255,68,102,0.06);
+  border: 1px solid rgba(255,68,102,0.25);
+  padding: 8px 14px;
+  text-align: center;
+}
+
+/* ── Edit Form ────────────────────────────────────────────────────── */
+.editForm {
+  width: 100%;
+  background: rgba(5,14,28,0.95);
+  border: 1px solid rgba(0,255,200,0.22);
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 0 40px rgba(0,255,200,0.05);
+  box-sizing: border-box;
+}
+.editFormTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: rgba(0,255,200,0.6);
+  margin-bottom: 4px;
+}
+.editFormIcon {
+  color: #00ffc8;
+  font-size: 14px;
+  text-shadow: 0 0 8px rgba(0,255,200,0.6);
+}
+.editDivider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,255,200,0.2), transparent);
+  margin: 4px 0;
+}
+.editPasswordNote {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(200,230,255,0.3);
+}
+.editField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.editLabel {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(0,255,200,0.5);
+}
+.editInput {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  color: #c8e6ff;
+  background: rgba(0,20,40,0.7);
+  border: 1px solid rgba(0,255,200,0.2);
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.editInput:focus {
+  border-color: rgba(0,255,200,0.5);
+  box-shadow: 0 0 12px rgba(0,255,200,0.08);
+}
+.editInput::placeholder {
+  color: rgba(200,230,255,0.2);
+  font-size: 11px;
+}
+.editActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+.cancelBtn {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(200,230,255,0.5);
+  background: transparent;
+  border: 1px solid rgba(200,230,255,0.2);
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.cancelBtn:hover {
+  color: #c8e6ff;
+  border-color: rgba(200,230,255,0.4);
+}
+.saveBtn {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #050a0f;
+  background: #00ffc8;
+  border: 1px solid #00ffc8;
+  padding: 10px 32px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 700;
+}
+.saveBtn:hover:not(:disabled) {
+  background: rgba(0,255,200,0.85);
+  box-shadow: 0 0 20px rgba(0,255,200,0.3);
+}
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .header        { padding: 12px 16px; }
+  .idCard        { padding: 24px 20px; gap: 16px; }
+  .idAvatar      { width: 60px; height: 60px; font-size: 24px; }
+  .idUsername    { font-size: 18px; }
+  .idBalanceValue { font-size: 22px; }
+  .statsGrid     { grid-template-columns: repeat(2, 1fr); }
+  .editForm      { padding: 20px 16px; }
+  .editActions   { flex-direction: column; }
+  .saveBtn, .cancelBtn { width: 100%; text-align: center; }
+}

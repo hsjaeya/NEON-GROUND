@@ -32,7 +32,8 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-// JWT 토큰 디코딩 함수
+const API_URL = import.meta.env.VITE_API_URL;
+
 const decodeToken = (token: string): any => {
   try {
     const base64Url = token.split(".")[1];
@@ -44,10 +45,15 @@ const decodeToken = (token: string): any => {
         .join(""),
     );
     return JSON.parse(jsonPayload);
-  } catch (error) {
-    console.error("Token decode error:", error);
+  } catch {
     return null;
   }
+};
+
+const isTokenExpired = (token: string): boolean => {
+  const payload = decodeToken(token);
+  if (!payload || !payload.exp) return true;
+  return Date.now() >= payload.exp * 1000;
 };
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -55,20 +61,60 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 앱 로드 시 로컬스토리지에서 사용자 정보 복원
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    setError(null);
+  };
+
+  // 앱 로드 시 토큰 유효성 확인 후 사용자 정보 복원
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
     const savedToken = localStorage.getItem("token");
-    if (savedUser && savedToken) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
+    const savedUser = localStorage.getItem("user");
+
+    if (savedToken && savedUser) {
+      if (isTokenExpired(savedToken)) {
+        logout();
+      } else {
+        try {
+          setUser(JSON.parse(savedUser));
+        } catch {
+          logout();
+        }
       }
     }
     setIsLoading(false);
   }, []);
+
+  // 토큰 만료 자동 감지 타이머
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token || !user) return;
+
+    const payload = decodeToken(token);
+    if (!payload?.exp) return;
+
+    const msUntilExpiry = payload.exp * 1000 - Date.now();
+    if (msUntilExpiry <= 0) {
+      logout();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      logout();
+    }, msUntilExpiry);
+
+    return () => clearTimeout(timer);
+  }, [user]);
+
+  const handleResponse = async (response: Response) => {
+    if (response.status === 401) {
+      logout();
+      throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
+    }
+    return response;
+  };
 
   const register = async (
     username: string,
@@ -77,7 +123,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   ): Promise<{ success: boolean; error?: string }> => {
     setError(null);
     try {
-      const response = await fetch("http://localhost:3000/user/register", {
+      const response = await fetch(`${API_URL}/user/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),
@@ -90,7 +136,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const data = await response.json();
 
-      // 회원가입 응답에서 user 정보 추출
       const userData: User = {
         id: data.id,
         username: data.username,
@@ -99,8 +144,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         createdAt: data.createdAt,
       };
 
-      // 로그인 API 호출해서 토큰 받기
-      const loginResponse = await fetch("http://localhost:3000/auth/login", {
+      const loginResponse = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -115,10 +159,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);
 
-      // 회원가입 후 최신 정보 자동 갱신
       setTimeout(async () => {
         try {
-          const userResponse = await fetch("http://localhost:3000/user/me", {
+          const userResponse = await fetch(`${API_URL}/user/me`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -135,7 +178,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               balance: freshData.wallets?.[0]?.balance || "0",
               createdAt: freshData.createdAt,
             };
-
             localStorage.setItem("user", JSON.stringify(freshUserData));
             setUser(freshUserData);
           }
@@ -158,7 +200,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   ): Promise<{ success: boolean; error?: string }> => {
     setError(null);
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -171,9 +213,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const data = await response.json();
 
-      // JWT 토큰에서 user 정보 추출
       const decodedToken = decodeToken(data.accessToken);
-
       if (!decodedToken) {
         throw new Error("토큰 디코딩 실패");
       }
@@ -190,10 +230,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);
 
-      // 로그인 후 최신 정보 자동 갱신
       setTimeout(async () => {
         try {
-          const userResponse = await fetch("http://localhost:3000/user/me", {
+          const userResponse = await fetch(`${API_URL}/user/me`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -210,7 +249,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               balance: freshData.wallets?.[0]?.balance || "0",
               createdAt: freshData.createdAt,
             };
-
             localStorage.setItem("user", JSON.stringify(freshUserData));
             setUser(freshUserData);
           }
@@ -227,23 +265,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
-    setError(null);
-  };
-
   const refreshUser = async (): Promise<void> => {
     const token = localStorage.getItem("token");
-    if (!token || !user) {
-      setError("No token or user found");
+    if (!token || !user) return;
+
+    if (isTokenExpired(token)) {
+      logout();
       return;
     }
 
     try {
-      console.log("Refreshing user info...");
-      const response = await fetch("http://localhost:3000/user/me", {
+      const response = await fetch(`${API_URL}/user/me`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -251,16 +283,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         },
       });
 
-      console.log("Response status:", response.status);
+      await handleResponse(response);
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("API Error:", errorData);
         throw new Error(errorData.message || `HTTP ${response.status}`);
       }
 
       const data = await response.json();
-      console.log("User data received:", data);
 
       const userData: User = {
         id: data.id,
@@ -270,14 +300,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         createdAt: data.createdAt,
       };
 
-      console.log("Updated user:", userData);
       localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);
       setError(null);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "사용자 정보 갱신 실패";
-      console.error("Refresh error:", errorMessage);
       setError(errorMessage);
     }
   };

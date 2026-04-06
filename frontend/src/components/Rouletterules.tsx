@@ -1,18 +1,26 @@
 import { useState } from "react";
 import styles from "./RouletteRules.module.css";
 
+const STORAGE_KEY = "roulette-rules-hidden";
+
 export default function RouletteRules() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(
+    () => localStorage.getItem(STORAGE_KEY) !== "true",
+  );
+
+  const closeOnce = () => setIsOpen(false);
+
+  const closeForever = () => {
+    localStorage.setItem(STORAGE_KEY, "true");
+    setIsOpen(false);
+  };
 
   return (
     <>
       {isOpen && (
-        <div className={styles.overlay} onClick={() => setIsOpen(false)}>
+        <div className={styles.overlay} onClick={closeOnce}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => setIsOpen(false)}
-              className={styles.closeBtn}
-            >
+            <button onClick={closeOnce} className={styles.closeBtn}>
               ✕
             </button>
 
@@ -152,16 +160,19 @@ export default function RouletteRules() {
                 <h2 className={styles.sectionTitle}>🎮 게임 진행</h2>
                 <ol className={styles.stepsList}>
                   <li>
-                    <strong>1단계:</strong> 칩 금액 선택 (₩1K ~ ₩100K)
+                    <strong>1단계:</strong> 칩 금액 선택 ($1K ~ $100K)
                   </li>
                   <li>
                     <strong>2단계:</strong> 원하는 숫자나 영역 클릭하여 베팅
                   </li>
                   <li>
-                    <strong>3단계:</strong> 여러 곳에 베팅 가능 (최대 50개)
+                    <strong>3단계:</strong> 여러 곳에 베팅 가능 — 내부
+                    베팅(Straight 등) 최대 5개, 외부 베팅(RED/BLACK 등) 종류별
+                    최대 1개
                   </li>
                   <li>
-                    <strong>4단계:</strong> SPIN 버튼 클릭
+                    <strong>4단계:</strong> 15초 타이머가 종료되면 자동으로
+                    룰렛이 스핀됩니다
                   </li>
                   <li>
                     <strong>5단계:</strong> 룰렛이 돌아가고 결과 확인
@@ -184,12 +195,46 @@ export default function RouletteRules() {
                 </ul>
               </section>
 
-              <div className={styles.footer}>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className={styles.startBtn}
-                >
+              <div
+                className={styles.footer}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "12px",
+                  marginTop: "32px",
+                }}
+              >
+                <button onClick={closeOnce} className={styles.startBtn}>
                   이제 시작하기! 🎰
+                </button>
+                <button
+                  onClick={closeForever}
+                  style={{
+                    fontFamily: "'Share Tech Mono', monospace",
+                    fontSize: "11px",
+                    letterSpacing: "0.15em",
+                    color: "rgba(200, 230, 255, 0.55)",
+                    background: "transparent",
+                    border: "1px solid rgba(200, 230, 255, 0.2)",
+                    cursor: "pointer",
+                    padding: "8px 28px",
+                    transition: "color 0.2s, border-color 0.2s",
+                    appearance: "none",
+                    WebkitAppearance: "none",
+                    outline: "none",
+                    display: "block",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.color = "rgba(200, 230, 255, 0.9)";
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(200, 230, 255, 0.45)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.color = "rgba(200, 230, 255, 0.55)";
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(200, 230, 255, 0.2)";
+                  }}
+                >
+                  다시 보지 않기
                 </button>
               </div>
             </div>

@@ -494,7 +494,7 @@ const MakeMoney: FC = () => {
     const totalValue = Math.floor(bonus);
 
     setPhase("success");
-    setMessage(`${currentFish.name}을(를) 낚았다! +₩${totalValue}`);
+    setMessage(`${currentFish.name}을(를) 낚았다! +$${totalValue}`);
     setBalance((prev) => prev + totalValue);
 
     const caughtFish: CaughtFish = {
@@ -559,7 +559,7 @@ const MakeMoney: FC = () => {
           <div className={styles.hudStat}>
             <span className={styles.hudLabel}>BALANCE</span>
             <span className={styles.hudValue}>
-              ₩ {balance.toLocaleString()}
+              $ {balance.toLocaleString()}
             </span>
           </div>
         </div>
@@ -579,7 +579,7 @@ const MakeMoney: FC = () => {
                   onClick={() => handleBaitSelect(bait)}
                 >
                   <div className={styles.baitName}>{bait.name}</div>
-                  <div className={styles.baitCost}>₩{bait.cost}</div>
+                  <div className={styles.baitCost}>${bait.cost}</div>
                 </button>
               ))}
             </div>
@@ -690,7 +690,7 @@ const MakeMoney: FC = () => {
                         {"★".repeat(fish.quality || 1)}
                       </span>
                       <span className={styles.fishItemValue}>
-                        +₩{fish.value.toLocaleString()}
+                        +${fish.value.toLocaleString()}
                       </span>
                     </div>
                   ))
@@ -713,7 +713,7 @@ const MakeMoney: FC = () => {
             />
           ))}
         </div>
-        <span>TOTAL EARNED: ₩ {balance.toLocaleString()}</span>
+        <span>TOTAL EARNED: $ {balance.toLocaleString()}</span>
       </footer>
     </div>
   );

@@ -248,7 +248,10 @@
 
 /* Footer */
 .footer {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
   margin-top: 32px;
 }
 
@@ -279,6 +282,27 @@
   );
   box-shadow: 0 0 40px rgba(0, 255, 200, 0.5);
   transform: translateY(-2px);
+}
+
+.hideBtn {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: rgba(200, 230, 255, 0.5);
+  background: transparent;
+  border: 1px solid rgba(200, 230, 255, 0.15);
+  cursor: pointer;
+  padding: 8px 28px;
+  transition: color 0.2s, border-color 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  display: block;
+  width: fit-content;
+}
+.hideBtn:hover {
+  color: rgba(200, 230, 255, 0.85);
+  border-color: rgba(200, 230, 255, 0.4);
 }
 
 /* Scrollbar */

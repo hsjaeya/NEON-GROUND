@@ -187,6 +187,7 @@
     inset 0 0 30px rgba(0, 0, 0, 0.6);
 }
 
+
 .wheelSlot {
   position: absolute;
   top: 50%;
@@ -463,71 +464,28 @@
   gap: 12px;
 }
 
+/* CSS Grid — 1 zero col | 12 number cols | 1 col-bet col */
 .tableLayout {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: 28px repeat(12, 1fr) 34px;
+  grid-template-rows: repeat(3, 36px) 30px 30px;
+  gap: 3px;
+  width: 100%;
 }
 
-/* Top row: [0 cell] + [number grid + 2:1] */
-.topRow {
-  display: flex;
-  gap: 6px;
-  align-items: stretch;
-}
-
-/* 0번 섹션 */
-.zeroSection {
-  display: flex;
-  flex-direction: column;
-}
-
-.zeroCell {
-  min-height: 110px !important;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px !important;
-  padding: 12px 8px !important;
-  width: 32px;
-}
-
-/* 메인 그리드 */
-.mainGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
-}
-
-.numbersArea {
-  display: flex;
-  gap: 4px;
-}
-
-.numberColumn {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
-
+/* Number cells (including 0) */
 .numberCell {
   font-family: "Orbitron", monospace;
   font-weight: 700;
   font-size: 11px;
-  padding: 8px 4px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   border: 1px solid transparent;
   transition: all 0.2s ease;
   position: relative;
-  min-height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  user-select: none;
 }
 
 .numberCell span {
@@ -535,12 +493,18 @@
   z-index: 2;
 }
 
+/* 0 cell — spans 3 rows, vertical text */
+.zeroNum {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 14px;
+}
+
 .cellRed {
   background: rgba(255, 0, 80, 0.15);
   color: #ff0055;
   border-color: rgba(255, 0, 80, 0.3);
 }
-
 .cellRed:hover {
   background: rgba(255, 0, 80, 0.3);
   border-color: #ff0055;
@@ -552,7 +516,6 @@
   color: #00ffc8;
   border-color: rgba(0, 255, 200, 0.2);
 }
-
 .cellBlack:hover {
   background: rgba(0, 255, 200, 0.18);
   border-color: #00ffc8;
@@ -564,119 +527,83 @@
   color: #00ff88;
   border-color: rgba(0, 255, 136, 0.3);
 }
-
 .cellGreen:hover {
   background: rgba(0, 255, 136, 0.25);
   border-color: #00ff88;
   box-shadow: 0 0 16px rgba(0, 255, 136, 0.4);
 }
 
-/* Column Bets Area */
-.columnBetsArea {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
+/* 2:1 column bet buttons */
 .columnBtn {
   font-family: "Orbitron", monospace;
   font-weight: 700;
-  font-size: 9px;
-  letter-spacing: 0.05em;
-  padding: 8px 4px;
+  font-size: 8px;
+  letter-spacing: 0.04em;
   background: rgba(0, 20, 35, 0.7);
   border: 1px solid rgba(180, 220, 255, 0.2);
-  color: rgba(180, 220, 255, 0.6);
+  color: rgba(180, 220, 255, 0.65);
   cursor: pointer;
   transition: all 0.2s ease;
-  flex: 1;
-  min-height: 34px;
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
 }
-
 .columnBtn:hover:not(:disabled) {
   border-color: rgba(180, 220, 255, 0.5);
-  background: rgba(0, 28, 48, 0.8);
   color: #c8eeff;
   box-shadow: 0 0 12px rgba(180, 220, 255, 0.3);
 }
-
 .columnBtn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
 }
 
-/* Outside Bets Area */
-.outsideArea {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.dozenBets {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-
+/* Dozen bet buttons */
 .dozenBtn {
   font-family: "Share Tech Mono", monospace;
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  padding: 9px 6px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
   background: rgba(0, 20, 35, 0.7);
   border: 1px solid rgba(180, 220, 255, 0.2);
   color: rgba(180, 220, 255, 0.6);
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
 .dozenBtn:hover:not(:disabled) {
   border-color: rgba(180, 220, 255, 0.5);
   background: rgba(0, 28, 48, 0.8);
   color: #c8eeff;
   box-shadow: 0 0 12px rgba(180, 220, 255, 0.3);
 }
-
 .dozenBtn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
 }
 
-.evenMoneyBets {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-
-/* ───────────────────────────
-   OUTSIDE BETS
-─────────────────────────── */
-.outsideBets {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-
+/* Even-money bet buttons */
 .outsideBtn {
   font-family: "Share Tech Mono", monospace;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  padding: 9px 4px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
   background: rgba(0, 20, 35, 0.7);
   border: 1px solid rgba(180, 220, 255, 0.2);
   color: rgba(180, 220, 255, 0.6);
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
-.outsideBtn:hover {
+.outsideBtn:hover:not(:disabled) {
   border-color: rgba(180, 220, 255, 0.5);
   background: rgba(0, 28, 48, 0.8);
   color: #c8eeff;
   box-shadow: 0 0 12px rgba(180, 220, 255, 0.3);
 }
-
 .outsideBtn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
@@ -687,8 +614,7 @@
   border-color: rgba(255, 0, 80, 0.3);
   color: #ff0055;
 }
-
-.outsideBtnRed:hover {
+.outsideBtnRed:hover:not(:disabled) {
   background: rgba(255, 0, 80, 0.3);
   border-color: #ff0055;
   box-shadow: 0 0 16px rgba(255, 0, 80, 0.4);
@@ -699,8 +625,7 @@
   border-color: rgba(0, 255, 200, 0.2);
   color: #00ffc8;
 }
-
-.outsideBtnBlack:hover {
+.outsideBtnBlack:hover:not(:disabled) {
   background: rgba(0, 255, 200, 0.18);
   border-color: #00ffc8;
   box-shadow: 0 0 16px rgba(0, 255, 200, 0.4);
@@ -1388,26 +1313,184 @@
   overflow: hidden;
 }
 
-.chatHeader {
+/* ── Tab Bar ──────────────────────────────────────────────────────── */
+.chatTabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex-shrink: 0;
+  background: rgba(0, 4, 10, 0.85);
+  border-bottom: 1px solid rgba(0, 255, 200, 0.12);
+  position: relative;
+}
+
+/* 탭 사이 세로 구분선 */
+.chatTabs::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  height: 60%;
+  width: 1px;
+  background: rgba(0, 255, 200, 0.1);
+  pointer-events: none;
+}
+
+.chatTab {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: rgba(200, 238, 255, 0.3);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 13px 10px 11px;
+  cursor: pointer;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 10px 14px;
-  border-bottom: 1px solid rgba(0, 255, 200, 0.1);
+  justify-content: center;
+  gap: 8px;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+  position: relative;
+  user-select: none;
+}
+.chatTab:hover:not(.chatTabActive) {
+  color: rgba(200, 238, 255, 0.6);
+  background: rgba(0, 255, 200, 0.03);
+}
+
+.chatTabActive {
+  color: #00ffc8;
+  border-bottom: 2px solid #00ffc8;
+  background: rgba(0, 255, 200, 0.05);
+}
+/* 활성 탭 상단 얇은 빛줄기 */
+.chatTabActive::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 15%;
+  right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 200, 0.6), transparent);
+}
+
+.chatTabIcon {
+  font-size: 12px;
+  line-height: 1;
+  transition: text-shadow 0.2s;
+}
+.chatTabActive .chatTabIcon {
+  text-shadow: 0 0 8px rgba(0, 255, 200, 0.8);
+}
+
+.chatTabLabel {
+  transition: text-shadow 0.2s;
+}
+.chatTabActive .chatTabLabel {
+  text-shadow: 0 0 12px rgba(0, 255, 200, 0.5);
+}
+
+.chatTabBadge {
+  font-size: 9px;
+  font-family: "Share Tech Mono", monospace;
+  background: rgba(0, 255, 200, 0.08);
+  border: 1px solid rgba(0, 255, 200, 0.2);
+  color: rgba(0, 255, 200, 0.5);
+  padding: 1px 6px;
+  min-width: 20px;
+  text-align: center;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.chatTabBadgeActive {
+  background: rgba(0, 255, 200, 0.15);
+  border-color: rgba(0, 255, 200, 0.5);
+  color: #00ffc8;
+  box-shadow: 0 0 6px rgba(0, 255, 200, 0.2);
+}
+
+/* ── Player List Panel ────────────────────────────────────────────── */
+.playerList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.playerList::-webkit-scrollbar { width: 4px; }
+.playerList::-webkit-scrollbar-track { background: transparent; }
+.playerList::-webkit-scrollbar-thumb { background: rgba(0,255,200,0.2); border-radius: 2px; }
+
+.playerItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid rgba(0, 255, 200, 0.08);
+  background: rgba(0, 10, 20, 0.5);
+  transition: border-color 0.15s, background 0.15s;
+}
+.playerItem:hover {
+  border-color: rgba(0, 255, 200, 0.2);
+  background: rgba(0, 255, 200, 0.04);
+}
+.playerItemSelf {
+  border-color: rgba(0, 255, 200, 0.3);
+  background: rgba(0, 255, 200, 0.06);
+}
+
+.playerAvatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(200, 238, 255, 0.7);
+  background: rgba(0, 255, 200, 0.07);
+  border: 1px solid rgba(0, 255, 200, 0.2);
+  flex-shrink: 0;
+}
+.playerAvatarSelf {
+  color: #00ffc8;
+  background: rgba(0, 255, 200, 0.12);
+  border-color: rgba(0, 255, 200, 0.5);
+  box-shadow: 0 0 10px rgba(0, 255, 200, 0.2);
+}
+
+.playerName {
+  flex: 1;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(200, 238, 255, 0.7);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.playerItemSelf .playerName {
+  color: #e0f4ff;
+}
+
+.playerSelfTag {
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  color: #050a0f;
+  background: #00ffc8;
+  padding: 2px 7px;
+  font-weight: 700;
   flex-shrink: 0;
 }
 
-.chatTitle {
-  font-family: "Orbitron", monospace;
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 0.3em;
-  color: #00ffc8;
-}
-
-.chatStatus {
+.playerEmpty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 10px;
   letter-spacing: 0.1em;
+  color: rgba(200, 238, 255, 0.25);
 }
 
 .chatMessages {

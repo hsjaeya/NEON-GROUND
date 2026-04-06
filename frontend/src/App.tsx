@@ -7,6 +7,11 @@ import Login from "./pages/Login";
 import Register from "./pages/Resister";
 import MakeMoney from "./pages/Makemoney";
 import Roulette from "./pages/Roulette";
+import Blackjack from "./pages/Blackjack";
+import PokerLobby from "./pages/PokerLobby";
+import PokerRoom from "./pages/PokerRoom";
+import Ranking from "./pages/Ranking";
+import Profile from "./pages/Profile";
 
 // import other game pages...
 
@@ -95,16 +100,17 @@ function App(): React.ReactElement {
             }
           />
 
-          {/* Protected Game Routes - uncomment as you add games */}
-          {/* 
           <Route
             path="/blackJack"
             element={
               <ProtectedRoute>
-                <BlackJack />
+                <Blackjack />
               </ProtectedRoute>
             }
           />
+
+          {/* Protected Game Routes - uncomment as you add games */}
+          {/*
 
           <Route
             path="/slotMachine"
@@ -115,6 +121,38 @@ function App(): React.ReactElement {
             }
           />
           */}
+          <Route
+            path="/poker"
+            element={
+              <ProtectedRoute>
+                <PokerLobby />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/poker/room/:roomId"
+            element={
+              <ProtectedRoute>
+                <PokerRoom />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ranking"
+            element={
+              <ProtectedRoute>
+                <Ranking />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/makeMoney"
             element={

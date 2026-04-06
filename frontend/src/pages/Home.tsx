@@ -21,14 +21,7 @@ type Util = {
 const GAMES: Game[] = [
   { to: "/blackJack", icon: "🃏", name: "BLACK JACK", sub: "Card Protocol" },
   { to: "/roulette", icon: "🎡", name: "ROULETTE", sub: "Spin Matrix" },
-  { to: "/slotMachine", icon: "🎰", name: "SLOT MACHINE", sub: "RNG Engine" },
-  {
-    to: "/makeMoney",
-    icon: "💰",
-    name: "MAKE MONEY",
-    sub: "Credit Boost",
-    featured: true,
-  },
+  { to: "/poker", icon: "🂠", name: "POKER", sub: "Hand Matrix" },
 ];
 
 function SectionLabel({ text }: { text: string }) {
@@ -66,9 +59,13 @@ function GameCardStatic({
   name,
   sub,
   featured = false,
-}: Omit<Game, "to">) {
+  onClick,
+}: Omit<Game, "to"> & { onClick?: () => void }) {
   return (
-    <div className={`${styles.card} ${featured ? styles.cardFeatured : ""}`}>
+    <div
+      className={`${styles.card} ${featured ? styles.cardFeatured : ""} ${styles.cardClickable}`}
+      onClick={onClick}
+    >
       <div className={styles.cardCorner} />
       <div className={styles.cardGlow} />
       <span className={styles.cardIcon}>{icon}</span>
@@ -81,6 +78,73 @@ function GameCardStatic({
         <span className={styles.cardSub}>{sub}</span>
       </div>
       <span className={styles.cardArrow}>↗</span>
+    </div>
+  );
+}
+
+function LoginPromptModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalBox} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalIcon}>⚠</div>
+        <div className={styles.modalTitle}>ACCESS DENIED</div>
+        <div className={styles.modalDesc}>
+          게임을 플레이하려면 로그인이 필요합니다
+        </div>
+        <div className={styles.modalActions}>
+          <Link to="/login" className={styles.modalBtnPrimary}>
+            SIGN IN
+          </Link>
+          <Link to="/register" className={styles.modalBtnSecondary}>
+            CREATE ACCOUNT
+          </Link>
+        </div>
+        <button className={styles.modalClose} onClick={onClose}>✕</button>
+      </div>
+    </div>
+  );
+}
+
+interface BonusCardProps {
+  available: boolean | null;
+  countdown: string;
+  claiming: boolean;
+  onClaim: () => void;
+}
+
+function BonusCard({
+  available,
+  countdown,
+  claiming,
+  onClaim,
+}: BonusCardProps) {
+  const isAvailable = available === true;
+  return (
+    <div
+      className={`${styles.card} ${styles.cardFeatured} ${isAvailable ? styles.cardBonusAvailable : ""}`}
+      onClick={isAvailable && !claiming ? onClaim : undefined}
+      style={{ cursor: isAvailable ? "pointer" : "default" }}
+    >
+      <div className={styles.cardCorner} />
+      <div className={styles.cardGlow} />
+      <span className={styles.cardIcon}>💰</span>
+      <div className={styles.cardBody}>
+        <span className={`${styles.cardName} ${styles.cardNameFeatured}`}>
+          DAILY BONUS
+        </span>
+        <span className={styles.cardSub}>
+          {available === null
+            ? "Loading..."
+            : isAvailable
+              ? "$100,000 AVAILABLE"
+              : `NEXT IN ${countdown}`}
+        </span>
+      </div>
+      {isAvailable && (
+        <span className={`${styles.cardArrow} ${styles.cardArrowBonus}`}>
+          {claiming ? "..." : "↗"}
+        </span>
+      )}
     </div>
   );
 }
@@ -112,7 +176,12 @@ export default function Home() {
   const { user, logout, refreshUser } = useAuth();
   const navigate = useNavigate();
 
-  const [dailyBonus, setDailyBonus] = useState<{ available: boolean; nextClaimAt: string | null } | null>(null);
+  const [loginPrompt, setLoginPrompt] = useState(false);
+
+  const [dailyBonus, setDailyBonus] = useState<{
+    available: boolean;
+    nextClaimAt: string | null;
+  } | null>(null);
   const [bonusCountdown, setBonusCountdown] = useState("");
   const [claimingBonus, setClaimingBonus] = useState(false);
 
@@ -121,18 +190,23 @@ export default function Home() {
       refreshUser();
       fetchDailyBonusStatus();
     }
-  }, []);
+  }, [user?.id]);
 
   // Countdown timer
   useEffect(() => {
     if (!dailyBonus?.nextClaimAt) return;
     const tick = () => {
       const diff = new Date(dailyBonus.nextClaimAt!).getTime() - Date.now();
-      if (diff <= 0) { setDailyBonus({ available: true, nextClaimAt: null }); return; }
+      if (diff <= 0) {
+        setDailyBonus({ available: true, nextClaimAt: null });
+        return;
+      }
       const h = Math.floor(diff / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
       const s = Math.floor((diff % 60000) / 1000);
-      setBonusCountdown(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`);
+      setBonusCountdown(
+        `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`,
+      );
     };
     tick();
     const id = setInterval(tick, 1000);
@@ -143,9 +217,12 @@ export default function Home() {
     const token = localStorage.getItem("token");
     if (!token) return;
     try {
-      const res = await fetch("http://localhost:3000/user/daily-bonus", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/user/daily-bonus`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (res.ok) setDailyBonus(await res.json());
     } catch {}
   };
@@ -155,10 +232,13 @@ export default function Home() {
     if (!token || claimingBonus) return;
     setClaimingBonus(true);
     try {
-      const res = await fetch("http://localhost:3000/user/daily-bonus", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/user/daily-bonus`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (res.ok) {
         const data = await res.json();
         await refreshUser();
@@ -166,9 +246,12 @@ export default function Home() {
           available: false,
           nextClaimAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         });
-        alert(`💰 일일 보너스 ₩${Number(data.bonusAmount).toLocaleString()} 지급 완료!`);
+        alert(
+          `💰 일일 보너스 $${Number(data.bonusAmount).toLocaleString()} 지급 완료!`,
+        );
       }
-    } catch {} finally {
+    } catch {
+    } finally {
       setClaimingBonus(false);
     }
   };
@@ -185,6 +268,8 @@ export default function Home() {
         <div className={styles.scanlines} />
         <div className={styles.dotGrid} />
 
+        {loginPrompt && <LoginPromptModal onClose={() => setLoginPrompt(false)} />}
+
         {/* HUD */}
         <header className={styles.hud}>
           <div className={styles.hudLogo}>
@@ -192,7 +277,6 @@ export default function Home() {
             <span>NEON VAULT</span>
           </div>
           <div className={styles.hudInfo}>
-            {/* Dummy spacer to maintain header height */}
             <div className={styles.hudStat}>
               <span className={styles.hudLabel}>&nbsp;</span>
               <span className={styles.hudValue}>&nbsp;</span>
@@ -226,6 +310,7 @@ export default function Home() {
                   name={g.name}
                   sub={g.sub}
                   featured={g.featured}
+                  onClick={() => setLoginPrompt(true)}
                 />
               ))}
             </div>
@@ -270,8 +355,8 @@ export default function Home() {
 
   // 로그인 됨 - Game Hub 화면
   const UTILS: Util[] = [
+    { to: "/profile", label: "PROFILE" },
     { to: "/ranking", label: "RANKING" },
-    { to: "/setting", label: "SETTINGS" },
     { label: "LOGOUT", danger: true, onClick: handleLogout },
   ];
 
@@ -297,7 +382,7 @@ export default function Home() {
           <div className={styles.hudStat}>
             <span className={styles.hudLabel}>BALANCE</span>
             <span className={styles.hudValue}>
-              ₩ {parseFloat(String(user.balance || 0)).toLocaleString()}
+              $ {parseFloat(String(user.balance || 0)).toLocaleString()}
             </span>
           </div>
         </div>
@@ -325,6 +410,12 @@ export default function Home() {
             {GAMES.map((g) => (
               <GameCard key={g.to} {...g} />
             ))}
+            <BonusCard
+              available={dailyBonus?.available ?? null}
+              countdown={bonusCountdown}
+              claiming={claimingBonus}
+              onClaim={handleClaimBonus}
+            />
           </div>
         </section>
 
@@ -337,21 +428,14 @@ export default function Home() {
         <section className={styles.section}>
           <SectionLabel text="SYSTEM" />
           <div className={styles.utilRow}>
-            {dailyBonus?.available ? (
-              <button
-                onClick={handleClaimBonus}
-                disabled={claimingBonus}
-                className={`${styles.utilBtn} ${styles.dailyBonusBtn}`}
-              >
-                {claimingBonus ? "CLAIMING..." : "💰 DAILY BONUS ₩50,000"}
-              </button>
-            ) : dailyBonus && !dailyBonus.available && bonusCountdown ? (
-              <div className={styles.dailyBonusCooldown}>
-                BONUS IN {bonusCountdown}
-              </div>
-            ) : null}
             {UTILS.map(({ to, label, danger, onClick }) => (
-              <UtilButton key={label} to={to} label={label} danger={danger} onClick={onClick} />
+              <UtilButton
+                key={label}
+                to={to}
+                label={label}
+                danger={danger}
+                onClick={onClick}
+              />
             ))}
           </div>
         </section>

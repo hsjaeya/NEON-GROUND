@@ -92,6 +92,10 @@ export default function Roulette() {
   const [chatMessages, setChatMessages] = useState<ChatMsg[]>([]);
   const [chatInput, setChatInput] = useState("");
 
+  // Room users
+  const [roomUsers, setRoomUsers] = useState<{ count: number; usernames: string[] }>({ count: 0, usernames: [] });
+  const [activeTab, setActiveTab] = useState<"chat" | "players">("chat");
+
   // Refs
   const socketRef = useRef<Socket | null>(null);
   const betsRef = useRef<Bet[]>([]);
@@ -133,7 +137,7 @@ export default function Roulette() {
       sessionStorage.getItem("token");
     if (!token) return;
 
-    const socket = io("http://localhost:3000/roulette", {
+    const socket = io(`${import.meta.env.VITE_API_URL}/roulette`, {
       auth: { token },
       transports: ["websocket"],
     });
@@ -199,9 +203,9 @@ export default function Roulette() {
       const slotsToRotate =
         (WHEEL_ORDER.length - winningIndex - 1 + WHEEL_ORDER.length) %
         WHEEL_ORDER.length;
-      setRotation(360 * 5 + slotsToRotate * degreePerSlot);
+      setRotation(360 * 10 + slotsToRotate * degreePerSlot);
 
-      // After wheel animation (3s), show result + apply pending bet result
+      // After wheel animation (6s), show result + apply pending bet result
       setTimeout(() => {
         setResult(winningNumber);
         setHistory((prev) => {
@@ -239,7 +243,7 @@ export default function Roulette() {
         }
 
         setTimeout(() => setRotation(0), 500);
-      }, 3000);
+      }, 6100);
     });
 
     // Store bet result — displayed after wheel animation
@@ -252,6 +256,10 @@ export default function Roulette() {
 
     socket.on("chatMessage", (msg: ChatMsg) => {
       setChatMessages((prev) => [...prev.slice(-49), msg]);
+    });
+
+    socket.on("roomUsers", (data: { count: number; usernames: string[] }) => {
+      setRoomUsers(data);
     });
 
     return () => {
@@ -305,8 +313,23 @@ export default function Roulette() {
     const totalExisting = bets.reduce((sum, b) => sum + b.amount, 0);
     if (numBalance < chipValue + totalExisting) {
       alert(
-        `잔액 부족! (현재: ₩${numBalance.toLocaleString()}, 총 필요: ₩${(chipValue + totalExisting).toLocaleString()})`,
+        `잔액 부족! (현재: $${numBalance.toLocaleString()}, 총 필요: $${(chipValue + totalExisting).toLocaleString()})`,
       );
+      return;
+    }
+
+    // 완전히 동일한 베팅이 있으면 칩 누적
+    const numSet = new Set(numbers);
+    const dupIdx = bets.findIndex(
+      (b) =>
+        b.type === type &&
+        b.numbers.length === numbers.length &&
+        b.numbers.every((n) => numSet.has(n)),
+    );
+    if (dupIdx !== -1) {
+      setBets(bets.map((b, i) =>
+        i === dupIdx ? { ...b, amount: b.amount + chipValue } : b,
+      ));
       return;
     }
 
@@ -419,7 +442,7 @@ export default function Roulette() {
               <div className={styles.celebrationEmoji}>💰💰💰</div>
               <div className={styles.celebrationTitle}>JACKPOT!</div>
               <div className={styles.celebrationAmount}>
-                ₩{winAmount?.toLocaleString()}
+                ${winAmount?.toLocaleString()}
               </div>
               <div className={styles.celebrationSub}>INCREDIBLE WIN!</div>
             </>
@@ -429,7 +452,7 @@ export default function Roulette() {
               <div className={styles.celebrationEmoji}>⚡</div>
               <div className={styles.celebrationTitle}>BIG WIN!</div>
               <div className={styles.celebrationAmount}>
-                ₩{winAmount?.toLocaleString()}
+                ${winAmount?.toLocaleString()}
               </div>
             </>
           )}
@@ -437,7 +460,7 @@ export default function Roulette() {
             <>
               <div className={styles.celebrationTitle}>WIN!</div>
               <div className={styles.celebrationAmount}>
-                ₩{winAmount?.toLocaleString()}
+                ${winAmount?.toLocaleString()}
               </div>
             </>
           )}
@@ -463,7 +486,7 @@ export default function Roulette() {
           <div className={styles.headerBalance}>
             <span className={styles.balanceLabel}>BALANCE</span>
             <span className={styles.balanceValue}>
-              ₩{(localBalance ?? 0).toLocaleString()}
+              ${(localBalance ?? 0).toLocaleString()}
             </span>
           </div>
         </div>
@@ -482,7 +505,7 @@ export default function Roulette() {
             <span
               className={`${styles.sessionValue} ${sessionNet >= 0 ? styles.sessionProfit : styles.sessionLoss}`}
             >
-              {sessionNet >= 0 ? "+" : ""}₩{sessionNet.toLocaleString()}
+              {sessionNet >= 0 ? "+" : ""}${sessionNet.toLocaleString()}
             </span>
           </div>
           <div className={styles.sessionDivider} />
@@ -551,11 +574,11 @@ export default function Roulette() {
           <div className={styles.wheelContainer}>
             <div className={styles.wheelArrow}>▼</div>
             <div
-              className={styles.wheel}
+              className={`${styles.wheel} ${spinning ? styles.wheelSpinning : ""}`}
               style={{
                 transform: `rotate(${rotation}deg)`,
                 transition: spinning
-                  ? "transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)"
+                  ? "transform 6s cubic-bezier(0, 0.85, 0.15, 1)"
                   : "none",
               }}
             >
@@ -599,7 +622,7 @@ export default function Roulette() {
               </div>
               {winAmount !== null && winAmount > 0 && (
                 <div className={styles.winAmountBox}>
-                  WIN: ₩{winAmount.toLocaleString()}
+                  WIN: ${winAmount.toLocaleString()}
                 </div>
               )}
               {winAmount === 0 && (
@@ -644,7 +667,7 @@ export default function Roulette() {
                   className={`${styles.chip} ${chipValue === value ? styles.chipActive : ""}`}
                   disabled={!canBet}
                 >
-                  ₩{(value / 1000).toFixed(0)}K
+                  ${(value / 1000).toFixed(0)}K
                 </button>
               ))}
             </div>
@@ -668,183 +691,97 @@ export default function Roulette() {
               )}
             </div>
             <div className={styles.tableLayout}>
-              {/* Top row: 0 | numbers 1-36 | 2 to 1 */}
-              <div className={styles.topRow}>
-                <div className={styles.zeroSection}>
-                  <div
-                    className={`${styles.numberCell} ${styles.cellGreen} ${styles.zeroCell} ${!canBet ? styles.cellDisabled : ""}`}
-                    onClick={() => addBet("straight", [0], "0")}
-                  >
-                    <span>0</span>
-                  </div>
-                </div>
-
-                <div className={styles.mainGrid}>
-                  <div className={styles.numbersArea}>
-                    {Array.from({ length: 12 }, (_, col) => (
-                      <div key={col} className={styles.numberColumn}>
-                        {[3, 2, 1].map((row) => {
-                          const num = col * 3 + row;
-                          const color = getNumberColor(num);
-                          const isHot = hotNumbers.has(num);
-                          return (
-                            <div
-                              key={num}
-                              className={`${styles.numberCell} ${styles[`cell${color.charAt(0).toUpperCase() + color.slice(1)}`]} ${isHot ? styles.cellHot : ""} ${!canBet ? styles.cellDisabled : ""}`}
-                              onClick={() =>
-                                addBet("straight", [num], `${num}`)
-                              }
-                            >
-                              <span>{num}</span>
-                              {isHot && (
-                                <span className={styles.hotIndicator}>🔥</span>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className={styles.columnBetsArea}>
-                    {[3, 2, 1].map((row) => {
-                      const colNumbers = Array.from(
-                        { length: 12 },
-                        (_, i) => i * 3 + row,
-                      );
-                      return (
-                        <button
-                          key={row}
-                          onClick={() =>
-                            addBet("column", colNumbers, `COL ${row}`)
-                          }
-                          className={styles.columnBtn}
-                          disabled={!canBet}
-                        >
-                          2:1
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+              {/* 0 — spans all 3 number rows */}
+              <div
+                className={`${styles.numberCell} ${styles.cellGreen} ${styles.zeroNum} ${!canBet ? styles.cellDisabled : ""}`}
+                style={{ gridRow: "1 / 4", gridColumn: "1" }}
+                onClick={() => addBet("straight", [0], "0")}
+              >
+                <span>0</span>
               </div>
 
-              {/* Bottom rows: dozen bets + even money bets */}
-              <div className={styles.outsideArea}>
-                <div className={styles.dozenBets}>
-                  {(
-                    [
-                      ["1ST 12", 1],
-                      ["2ND 12", 13],
-                      ["3RD 12", 25],
-                    ] as [string, number][]
-                  ).map(([label, start]) => (
-                    <button
-                      key={label}
-                      onClick={() =>
-                        addBet(
-                          "dozen",
-                          Array.from({ length: 12 }, (_, i) => i + start),
-                          label,
-                        )
-                      }
-                      className={styles.dozenBtn}
-                      disabled={!canBet}
+              {/* Numbers 1–36: row 3 (top), 2 (mid), 1 (bot) */}
+              {([3, 2, 1] as number[]).flatMap((row, rowIdx) =>
+                Array.from({ length: 12 }, (_, col) => {
+                  const num = col * 3 + row;
+                  const color = getNumberColor(num);
+                  const isHot = hotNumbers.has(num);
+                  return (
+                    <div
+                      key={num}
+                      className={`${styles.numberCell} ${styles[`cell${color.charAt(0).toUpperCase() + color.slice(1)}`]} ${isHot ? styles.cellHot : ""} ${!canBet ? styles.cellDisabled : ""}`}
+                      style={{ gridRow: rowIdx + 1, gridColumn: col + 2 }}
+                      onClick={() => addBet("straight", [num], `${num}`)}
                     >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-                <div className={styles.evenMoneyBets}>
+                      <span>{num}</span>
+                      {isHot && <span className={styles.hotIndicator}>🔥</span>}
+                    </div>
+                  );
+                })
+              )}
+
+              {/* 2:1 column bet buttons — right side, one per row */}
+              {([3, 2, 1] as number[]).map((row, rowIdx) => {
+                const colNums = Array.from({ length: 12 }, (_, i) => i * 3 + row);
+                return (
                   <button
-                    onClick={() =>
-                      addBet(
-                        "lowhigh",
-                        Array.from({ length: 18 }, (_, i) => i + 1),
-                        "1-18",
-                      )
-                    }
-                    className={styles.outsideBtn}
+                    key={row}
+                    className={styles.columnBtn}
+                    style={{ gridRow: rowIdx + 1, gridColumn: "14" }}
+                    onClick={() => addBet("column", colNums, `COL ${row}`)}
                     disabled={!canBet}
                   >
-                    1-18
+                    2:1
                   </button>
-                  <button
-                    onClick={() =>
-                      addBet(
-                        "evenodd",
-                        Array.from(
-                          { length: 18 },
-                          (_, i) => (i + 1) * 2,
-                        ).filter((n) => n <= 36),
-                        "EVEN",
-                      )
-                    }
-                    className={styles.outsideBtn}
-                    disabled={!canBet}
-                  >
-                    EVEN
-                  </button>
-                  <button
-                    onClick={() =>
-                      addBet(
-                        "redblack",
-                        [
-                          1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30,
-                          32, 34, 36,
-                        ],
-                        "RED",
-                      )
-                    }
-                    className={`${styles.outsideBtn} ${styles.outsideBtnRed}`}
-                    disabled={!canBet}
-                  >
-                    RED
-                  </button>
-                  <button
-                    onClick={() =>
-                      addBet(
-                        "redblack",
-                        [
-                          2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28,
-                          29, 31, 33, 35,
-                        ],
-                        "BLACK",
-                      )
-                    }
-                    className={`${styles.outsideBtn} ${styles.outsideBtnBlack}`}
-                    disabled={!canBet}
-                  >
-                    BLACK
-                  </button>
-                  <button
-                    onClick={() =>
-                      addBet(
-                        "evenodd",
-                        Array.from({ length: 18 }, (_, i) => i * 2 + 1),
-                        "ODD",
-                      )
-                    }
-                    className={styles.outsideBtn}
-                    disabled={!canBet}
-                  >
-                    ODD
-                  </button>
-                  <button
-                    onClick={() =>
-                      addBet(
-                        "lowhigh",
-                        Array.from({ length: 18 }, (_, i) => i + 19),
-                        "19-36",
-                      )
-                    }
-                    className={styles.outsideBtn}
-                    disabled={!canBet}
-                  >
-                    19-36
-                  </button>
-                </div>
-              </div>
+                );
+              })}
+
+              {/* Dozen bets — aligned under each third of the number grid */}
+              {(
+                [
+                  ["1ST 12", 1,  "2 / 6" ],
+                  ["2ND 12", 13, "6 / 10"],
+                  ["3RD 12", 25, "10 / 14"],
+                ] as [string, number, string][]
+              ).map(([label, start, col]) => (
+                <button
+                  key={label}
+                  className={styles.dozenBtn}
+                  style={{ gridRow: "4", gridColumn: col }}
+                  onClick={() =>
+                    addBet(
+                      "dozen",
+                      Array.from({ length: 12 }, (_, i) => i + start),
+                      label,
+                    )
+                  }
+                  disabled={!canBet}
+                >
+                  {label}
+                </button>
+              ))}
+
+              {/* Even-money bets — each spans 2 number columns */}
+              {(
+                [
+                  { label: "1-18",  type: "lowhigh"  as BetType, nums: Array.from({ length: 18 }, (_, i) => i + 1),                                       col: "2 / 4",   cls: "" },
+                  { label: "EVEN",  type: "evenodd"  as BetType, nums: Array.from({ length: 18 }, (_, i) => (i + 1) * 2).filter((n) => n <= 36),           col: "4 / 6",   cls: "" },
+                  { label: "RED",   type: "redblack" as BetType, nums: [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36],                                 col: "6 / 8",   cls: styles.outsideBtnRed },
+                  { label: "BLACK", type: "redblack" as BetType, nums: [2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35],                                col: "8 / 10",  cls: styles.outsideBtnBlack },
+                  { label: "ODD",   type: "evenodd"  as BetType, nums: Array.from({ length: 18 }, (_, i) => i * 2 + 1),                                    col: "10 / 12", cls: "" },
+                  { label: "19-36", type: "lowhigh"  as BetType, nums: Array.from({ length: 18 }, (_, i) => i + 19),                                       col: "12 / 14", cls: "" },
+                ]
+              ).map((bet) => (
+                <button
+                  key={bet.label}
+                  className={`${styles.outsideBtn} ${bet.cls}`}
+                  style={{ gridRow: "5", gridColumn: bet.col }}
+                  onClick={() => addBet(bet.type, bet.nums, bet.label)}
+                  disabled={!canBet}
+                >
+                  {bet.label}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -866,7 +803,7 @@ export default function Roulette() {
                     <div className={styles.betInfo}>
                       <span className={styles.betName}>{bet.name}</span>
                       <span className={styles.betAmount}>
-                        ₩{bet.amount.toLocaleString()} ·{" "}
+                        ${bet.amount.toLocaleString()} ·{" "}
                         {getPayoutMultiplier(bet.type)}:1
                       </span>
                     </div>
@@ -883,7 +820,7 @@ export default function Roulette() {
             )}
             {bets.length > 0 && (
               <div className={styles.totalBet}>
-                TOTAL BET: ₩{totalBetAmount.toLocaleString()}
+                TOTAL BET: ${totalBetAmount.toLocaleString()}
               </div>
             )}
           </div>
@@ -907,46 +844,83 @@ export default function Roulette() {
           </div>
         </div>
 
-        {/* Chat Section */}
+        {/* Chat / Players Section */}
         <div className={styles.chatSection}>
-          <div className={styles.chatHeader}>
-            <span className={styles.chatTitle}>LIVE CHAT</span>
-            <span
-              className={styles.chatStatus}
-              style={{ color: connected ? "#00ffc8" : "#ff4444" }}
-            >
-              {connected ? "● ONLINE" : "● OFFLINE"}
-            </span>
-          </div>
-          <div className={styles.chatMessages}>
-            {chatMessages.map((msg, i) => (
-              <div key={i} className={styles.chatMessage}>
-                <span className={styles.chatUsername}>{msg.username}</span>
-                <span className={styles.chatText}>{msg.message}</span>
-              </div>
-            ))}
-            <div ref={chatEndRef} />
-          </div>
-          <div className={styles.chatInputArea}>
-            <input
-              className={styles.chatInput}
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") sendChat();
-              }}
-              placeholder="메시지 입력..."
-              maxLength={200}
-              disabled={!connected}
-            />
+          {/* Tab Bar */}
+          <div className={styles.chatTabs}>
             <button
-              className={styles.chatSendBtn}
-              onClick={sendChat}
-              disabled={!connected || !chatInput.trim()}
+              className={`${styles.chatTab} ${activeTab === "chat" ? styles.chatTabActive : ""}`}
+              onClick={() => setActiveTab("chat")}
             >
-              ↑
+              <span className={styles.chatTabIcon}>◈</span>
+              <span className={styles.chatTabLabel}>LIVE CHAT</span>
+            </button>
+            <button
+              className={`${styles.chatTab} ${activeTab === "players" ? styles.chatTabActive : ""}`}
+              onClick={() => setActiveTab("players")}
+            >
+              <span className={styles.chatTabIcon}>◉</span>
+              <span className={styles.chatTabLabel}>PLAYERS</span>
+              <span className={`${styles.chatTabBadge} ${activeTab === "players" ? styles.chatTabBadgeActive : ""}`}>
+                {roomUsers.count}
+              </span>
             </button>
           </div>
+
+          {/* Chat Panel */}
+          {activeTab === "chat" && (
+            <>
+              <div className={styles.chatMessages}>
+                {chatMessages.map((msg, i) => (
+                  <div key={i} className={styles.chatMessage}>
+                    <span className={styles.chatUsername}>{msg.username}</span>
+                    <span className={styles.chatText}>{msg.message}</span>
+                  </div>
+                ))}
+                <div ref={chatEndRef} />
+              </div>
+              <div className={styles.chatInputArea}>
+                <input
+                  className={styles.chatInput}
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") sendChat(); }}
+                  placeholder="메시지 입력..."
+                  maxLength={200}
+                  disabled={!connected}
+                />
+                <button
+                  className={styles.chatSendBtn}
+                  onClick={sendChat}
+                  disabled={!connected || !chatInput.trim()}
+                >
+                  ↑
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* Players Panel */}
+          {activeTab === "players" && (
+            <div className={styles.playerList}>
+              {roomUsers.usernames.length === 0 ? (
+                <div className={styles.playerEmpty}>접속 중인 플레이어 없음</div>
+              ) : (
+                roomUsers.usernames.map((name, i) => {
+                  const isSelf = name === user.username;
+                  return (
+                    <div key={i} className={`${styles.playerItem} ${isSelf ? styles.playerItemSelf : ""}`}>
+                      <div className={`${styles.playerAvatar} ${isSelf ? styles.playerAvatarSelf : ""}`}>
+                        {name.charAt(0).toUpperCase()}
+                      </div>
+                      <span className={styles.playerName}>{name}</span>
+                      {isSelf && <span className={styles.playerSelfTag}>YOU</span>}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
         </div>
       </main>
     </div>
