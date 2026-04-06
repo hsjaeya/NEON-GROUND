@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useState, useContext, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
 
 interface User {
@@ -265,7 +265,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const refreshUser = async (): Promise<void> => {
+  const refreshUser = useCallback(async (): Promise<void> => {
     const token = localStorage.getItem("token");
     if (!token || !user) return;
 
@@ -308,7 +308,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         err instanceof Error ? err.message : "사용자 정보 갱신 실패";
       setError(errorMessage);
     }
-  };
+  }, [user]);
 
   const value: AuthContextType = {
     user,
