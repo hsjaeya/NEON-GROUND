@@ -120,7 +120,7 @@ export default function Blackjack() {
     socket.on("error", (d: { message: string }) => setError(d.message));
     socket.on("connect_error", () => setError("CONNECTION ERROR"));
 
-    return () => socket.disconnect();
+    return () => { socket.disconnect(); };
   }, [token, refreshUser]);
 
   const send = useCallback((event: string, data?: unknown) => {

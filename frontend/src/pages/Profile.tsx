@@ -60,7 +60,7 @@ function StatBox({
 }
 
 export default function Profile() {
-  const { user, refreshUser } = useAuth();
+  const { refreshUser } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
