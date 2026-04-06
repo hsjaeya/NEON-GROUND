@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "./RouletteRules.module.css";
+import styles from "./Rouletterules.module.css";
 
 const STORAGE_KEY = "roulette-rules-hidden";
 
