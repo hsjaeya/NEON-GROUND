@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/Authcontext";
 import styles from "./Profile.module.css";
 import type { FormEvent } from "react";
@@ -60,7 +60,8 @@ function StatBox({
 }
 
 export default function Profile() {
-  const { refreshUser } = useAuth();
+  const { refreshUser, logout } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -73,6 +74,27 @@ export default function Profile() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
   const [saveSuccess, setSaveSuccess] = useState("");
+
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/user/me`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        logout();
+        navigate("/");
+      }
+    } catch {
+      setDeleting(false);
+      setDeleteConfirm(false);
+    }
+  };
 
   useEffect(() => {
     fetchProfile();
@@ -430,9 +452,42 @@ export default function Profile() {
                 RANKING
               </Link>
             </div>
+
+            {/* Delete Account */}
+            <div className={styles.deleteZone}>
+              <button className={styles.deleteBtn} onClick={() => setDeleteConfirm(true)}>
+                WITHDRAW ACCOUNT
+              </button>
+            </div>
           </>
         )}
       </main>
+
+      {/* Delete Confirm Modal */}
+      {deleteConfirm && (
+        <div className={styles.deleteOverlay} onClick={() => setDeleteConfirm(false)}>
+          <div className={styles.deleteModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.deleteModalIcon}>⚠</div>
+            <div className={styles.deleteModalTitle}>ACCOUNT DELETION</div>
+            <div className={styles.deleteModalDesc}>
+              정말로 탈퇴하시겠습니까?<br />
+              모든 데이터가 삭제되며 복구할 수 없습니다.
+            </div>
+            <div className={styles.deleteModalActions}>
+              <button className={styles.deleteCancelBtn} onClick={() => setDeleteConfirm(false)}>
+                CANCEL
+              </button>
+              <button
+                className={styles.deleteConfirmBtn}
+                onClick={handleDeleteAccount}
+                disabled={deleting}
+              >
+                {deleting ? "DELETING..." : "CONFIRM"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

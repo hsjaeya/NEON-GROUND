@@ -562,6 +562,107 @@
   box-shadow: 0 0 12px rgba(0,255,200,0.08);
 }
 
+/* ── Delete Account ──────────────────────────────────────────────── */
+.deleteZone {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+.deleteBtn {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(255,80,80,0.5);
+  background: transparent;
+  border: 1px solid rgba(255,80,80,0.2);
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.deleteBtn:hover {
+  color: #ff5050;
+  border-color: rgba(255,80,80,0.6);
+  box-shadow: 0 0 12px rgba(255,80,80,0.1);
+}
+
+/* ── Delete Confirm Modal ─────────────────────────────────────────── */
+.deleteOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+.deleteModal {
+  background: #050a0f;
+  border: 1px solid rgba(255,80,80,0.4);
+  padding: 40px 32px;
+  max-width: 360px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+.deleteModalIcon {
+  font-size: 28px;
+  color: #ff5050;
+}
+.deleteModalTitle {
+  font-size: 16px;
+  letter-spacing: 3px;
+  color: #ff5050;
+}
+.deleteModalDesc {
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: rgba(200,230,255,0.6);
+  text-align: center;
+  line-height: 1.6;
+}
+.deleteModalActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+.deleteCancelBtn {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(200,230,255,0.6);
+  background: transparent;
+  border: 1px solid rgba(200,230,255,0.2);
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.deleteCancelBtn:hover {
+  color: #c8e6ff;
+  border-color: rgba(200,230,255,0.5);
+}
+.deleteConfirmBtn {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #ff5050;
+  background: transparent;
+  border: 1px solid rgba(255,80,80,0.5);
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.deleteConfirmBtn:hover {
+  background: rgba(255,80,80,0.1);
+  border-color: #ff5050;
+}
+.deleteConfirmBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 /* ── Edit Button ──────────────────────────────────────────────────── */
 .idUsernameRow {
   display: flex;
