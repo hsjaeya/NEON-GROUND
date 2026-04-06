@@ -22,7 +22,7 @@ export default function BlackjackRules() {
         style={{
           position: "fixed",
           bottom: "40px",
-          right: "24px",
+          left: "24px",
           zIndex: 100,
           fontFamily: "'Share Tech Mono', monospace",
           fontSize: "11px",
