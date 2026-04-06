@@ -9,6 +9,7 @@ export class PrismaService
 {
   constructor() {
     const connectionString = process.env.DATABASE_URL;
+    console.log('[PrismaService] DATABASE_URL:', connectionString ? connectionString.replace(/:\/\/.*@/, '://*****@') : 'NOT SET');
     if (!connectionString) {
       throw new Error('DATABASE_URL environment variable is not set');
     }
