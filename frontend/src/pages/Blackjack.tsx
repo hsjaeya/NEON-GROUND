@@ -144,7 +144,6 @@ export default function Blackjack() {
   const handleNewGame = () => {
     send("newGame");
     setLocalBet(0);
-    setDealKey(k => k + 1);
   };
 
   if (!gs) {
