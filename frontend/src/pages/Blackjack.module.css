@@ -348,6 +348,20 @@
 }
 .btnClear:disabled { opacity: 0.25; cursor: default; }
 
+.betPanelActions { display: flex; gap: 8px; align-items: center; }
+
+.btnRepeat {
+  font-family: "Share Tech Mono", monospace; font-size: 8px; letter-spacing: 0.2em;
+  padding: 6px 14px; background: transparent;
+  border: 1px solid rgba(0,255,200,0.45); color: rgba(0,255,200,0.7);
+  cursor: pointer; transition: all 0.18s;
+  clip-path: polygon(4px 0%, 100% 0%, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0% 100%, 0% 4px);
+}
+.btnRepeat:hover {
+  border-color: rgba(0,255,200,0.8); color: #00ffc8;
+  box-shadow: 0 0 10px rgba(0,255,200,0.25);
+}
+
 /* Credit-bar chip buttons */
 .chipRow { display: flex; gap: 6px; }
 .chip {

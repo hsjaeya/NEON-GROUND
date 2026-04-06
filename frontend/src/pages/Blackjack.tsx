@@ -93,6 +93,7 @@ export default function Blackjack() {
 
   const [gs, setGs] = useState<GameState | null>(null);
   const [localBet, setLocalBet] = useState(0);
+  const [lastBet, setLastBet] = useState(0);
   const [error, setError] = useState("");
   const [dealKey, setDealKey] = useState(0);
 
@@ -137,8 +138,14 @@ export default function Blackjack() {
 
   const handleDeal = () => {
     if (localBet < 500) { setError("Minimum bet is $500"); return; }
+    setLastBet(localBet);
     send("placeBet", { amount: localBet });
     setLocalBet(0);
+  };
+
+  const handleRepeatBet = () => {
+    if (!lastBet) return;
+    setLocalBet(Math.min(lastBet, Math.min(balance, 500000)));
   };
 
   const handleNewGame = () => {
@@ -279,13 +286,24 @@ export default function Blackjack() {
                   <span className={styles.currentBetLabel}>CURRENT BET</span>
                   <span className={styles.currentBetAmount}>${localBet.toLocaleString()}</span>
                 </div>
-                <button
-                  className={styles.btnClear}
-                  onClick={() => setLocalBet(0)}
-                  disabled={localBet === 0}
-                >
-                  CLEAR
-                </button>
+                <div className={styles.betPanelActions}>
+                  {lastBet > 0 && (
+                    <button
+                      className={styles.btnRepeat}
+                      onClick={handleRepeatBet}
+                      title={`이전 배팅 $${lastBet.toLocaleString()}`}
+                    >
+                      ↺ ${lastBet.toLocaleString()}
+                    </button>
+                  )}
+                  <button
+                    className={styles.btnClear}
+                    onClick={() => setLocalBet(0)}
+                    disabled={localBet === 0}
+                  >
+                    CLEAR
+                  </button>
+                </div>
               </div>
               <div className={styles.chipRow}>
                 {CHIP_CONFIG.map(chip => (
