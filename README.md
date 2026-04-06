@@ -20,8 +20,8 @@
 
 ## 기술 스택
 
-| | |
-|---|---|
+| Category | Stack |
+|----------|-------|
 | Frontend | React 19, TypeScript, Vite, React Router, socket.io-client |
 | Backend | NestJS, Prisma v7, PostgreSQL, socket.io, JWT, Passport |
 | Deploy | Vercel (Frontend), CloudType (Backend) |
