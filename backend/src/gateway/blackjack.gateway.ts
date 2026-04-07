@@ -168,7 +168,7 @@ export class BlackjackGateway implements OnGatewayConnection, OnGatewayDisconnec
 
     const wallet = await this.prisma.wallet.findFirst({ where: { userId: user.id } });
     const balance = wallet ? parseFloat(wallet.balance.toString()) : 0;
-    if (balance < session.bet) {
+    if (balance < session.bet * 2) {
       client.emit('error', { message: 'Insufficient balance to double down' }); return;
     }
 
