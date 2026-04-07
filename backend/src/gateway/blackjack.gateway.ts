@@ -233,14 +233,16 @@ export class BlackjackGateway implements OnGatewayConnection, OnGatewayDisconnec
   private async applyNet(userId: number, net: number, bet?: number) {
     if (net !== 0) {
       try {
-        const w = await this.prisma.wallet.findFirst({ where: { userId } });
-        if (w) {
-          const next = new Decimal(w.balance.toString()).add(new Decimal(net));
-          await this.prisma.wallet.update({
-            where: { id: w.id },
-            data: { balance: next.lessThan(0) ? '0' : next.toFixed() },
-          });
-        }
+        await this.prisma.$transaction(async (tx) => {
+          const w = await tx.wallet.findFirst({ where: { userId } });
+          if (w) {
+            const next = new Decimal(w.balance.toString()).add(new Decimal(net));
+            await tx.wallet.update({
+              where: { id: w.id },
+              data: { balance: next.lessThan(0) ? '0' : next.toFixed() },
+            });
+          }
+        });
       } catch { /* ignore */ }
     }
     if (bet !== undefined) {

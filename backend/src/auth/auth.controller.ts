@@ -10,9 +10,6 @@ export class AuthController {
   @Post('login')
   async logIn(@Req() req) {
     const user = req?.user;
-
-    console.log('user : ', user);
-
     return this.authService.logIn(user);
   }
 }

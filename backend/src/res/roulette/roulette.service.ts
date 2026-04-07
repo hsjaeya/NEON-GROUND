@@ -159,22 +159,9 @@ export class RouletteService {
     this.validateBetComposition(dto.bets);
 
     const totalBet = dto.bets.reduce((sum, bet) => sum + bet.amount, 0);
-
-    const wallet = await this.prisma.wallet.findFirst({
-      where: { userId },
-    });
-
-    if (!wallet) {
-      throw new BadRequestException('Wallet not found');
-    }
-
-    const currentBalance = new Decimal(wallet.balance);
     const betAmount = new Decimal(totalBet);
 
-    if (currentBalance.lessThan(betAmount)) {
-      throw new BadRequestException('Insufficient balance');
-    }
-
+    // 결과는 트랜잭션 밖에서 미리 생성 (DB 의존 없음)
     const result = Math.floor(Math.random() * 37);
 
     let totalWin = new Decimal(0);
@@ -186,7 +173,7 @@ export class RouletteService {
         : new Decimal(0);
 
       if (won) {
-        totalWin = totalWin.add(new Decimal(bet.amount)).add(payout); // 원금 + 배당금 합산
+        totalWin = totalWin.add(new Decimal(bet.amount)).add(payout);
       }
 
       return {
@@ -198,12 +185,21 @@ export class RouletteService {
       };
     });
 
-    const gameResult = await this.prisma.$transaction(async (tx) => {
+    // 잔액 읽기와 차감을 하나의 트랜잭션으로 처리하여 race condition 방지
+    const { game, newBalance } = await this.prisma.$transaction(async (tx) => {
+      const wallet = await tx.wallet.findFirst({ where: { userId } });
+      if (!wallet) throw new BadRequestException('Wallet not found');
+
+      const currentBalance = new Decimal(wallet.balance);
+      if (currentBalance.lessThan(betAmount)) {
+        throw new BadRequestException('Insufficient balance');
+      }
+
+      const updatedBalance = currentBalance.sub(betAmount).add(totalWin);
+
       await tx.wallet.update({
         where: { id: wallet.id },
-        data: {
-          balance: currentBalance.sub(betAmount).toFixed(),
-        },
+        data: { balance: updatedBalance.toFixed() },
       });
 
       const game = await tx.rouletteGame.create({
@@ -222,41 +218,21 @@ export class RouletteService {
             })),
           },
         },
-        include: {
-          bets: true,
-        },
+        include: { bets: true },
       });
 
-      if (totalWin.greaterThan(0)) {
-        await tx.wallet.update({
-          where: { id: wallet.id },
-          data: {
-            balance: currentBalance.sub(betAmount).add(totalWin).toFixed(),
-          },
-        });
-      }
-
-      return game;
+      return { game, newBalance: updatedBalance };
     });
-
-    const updatedWallet = await this.prisma.wallet.findFirst({
-      where: { userId },
-    });
-
-    if (!updatedWallet) {
-      throw new BadRequestException('Wallet not found after transaction');
-    }
 
     const totalWinNum = totalWin.toNumber();
-
     this.stats.recordGame(userId, totalBet, totalWinNum).catch(() => {});
 
     return {
       result,
       totalBet,
       totalWin: totalWinNum,
-      newBalance: parseFloat(updatedWallet.balance.toString()),
-      gameId: gameResult.id,
+      newBalance: parseFloat(newBalance.toFixed()),
+      gameId: game.id,
       bets: betResults,
     };
   }
@@ -278,14 +254,7 @@ export class RouletteService {
     }
 
     const totalBet = bets.reduce((sum, bet) => sum + bet.amount, 0);
-
-    const wallet = await this.prisma.wallet.findFirst({ where: { userId } });
-    if (!wallet) return null;
-
-    const currentBalance = new Decimal(wallet.balance);
     const betAmount = new Decimal(totalBet);
-
-    if (currentBalance.lessThan(betAmount)) return null;
 
     let totalWin = new Decimal(0);
     const betResults = bets.map((bet) => {
@@ -296,9 +265,16 @@ export class RouletteService {
       return { type: bet.type, numbers: bet.numbers, amount: bet.amount, won, payout: payout.toNumber() };
     });
 
-    await this.prisma.$transaction(async (tx) => {
-      const newBalance = currentBalance.sub(betAmount).add(totalWin);
-      await tx.wallet.update({ where: { id: wallet.id }, data: { balance: newBalance.toFixed() } });
+    // 잔액 읽기와 차감을 하나의 트랜잭션으로 처리하여 race condition 방지
+    const newBalance = await this.prisma.$transaction(async (tx) => {
+      const wallet = await tx.wallet.findFirst({ where: { userId } });
+      if (!wallet) return null;
+
+      const currentBalance = new Decimal(wallet.balance);
+      if (currentBalance.lessThan(betAmount)) return null;
+
+      const updatedBalance = currentBalance.sub(betAmount).add(totalWin);
+      await tx.wallet.update({ where: { id: wallet.id }, data: { balance: updatedBalance.toFixed() } });
       await tx.rouletteGame.create({
         data: {
           userId,
@@ -316,17 +292,19 @@ export class RouletteService {
           },
         },
       });
+
+      return updatedBalance;
     });
 
-    const updatedWallet = await this.prisma.wallet.findFirst({ where: { userId } });
-    const totalWinNum = totalWin.toNumber();
+    if (newBalance === null) return null;
 
+    const totalWinNum = totalWin.toNumber();
     this.stats.recordGame(userId, totalBet, totalWinNum).catch(() => {});
 
     return {
       totalBet,
       totalWin: totalWinNum,
-      newBalance: parseFloat(updatedWallet!.balance.toString()),
+      newBalance: parseFloat(newBalance.toFixed()),
     };
   }
 
