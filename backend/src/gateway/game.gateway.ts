@@ -29,9 +29,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   private roundId = 0;
   private timer: NodeJS.Timeout | null = null;
 
-  // Persistent state for late joiners
-  private chatHistory: ChatMsg[] = [];       // last 50 messages
-  private recentResults: number[] = [];      // last 20 spin results
+  // 늦게 접속한 유저에게 전송할 상태 (최근 채팅 50개, 결과 20개)
+  private chatHistory: ChatMsg[] = [];
+  private recentResults: number[] = [];
 
   constructor(
     private jwtService: JwtService,
@@ -50,12 +50,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       this.socketUsers.set(client.id, { id: payload.id, username: payload.username });
       this.userSockets.set(payload.id, client.id);
 
-      // Send current state to newly connected client
       client.emit('gameState', { phase: this.phase, timeLeft: this.timeLeft, roundId: this.roundId });
       if (this.chatHistory.length > 0) client.emit('chatHistory', this.chatHistory);
       if (this.recentResults.length > 0) client.emit('recentResults', this.recentResults);
-
-      // Broadcast updated room users to everyone
       this.broadcastRoomUsers();
     } catch {
       client.disconnect();
@@ -121,14 +118,12 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const result = Math.floor(Math.random() * 37);
     const currentRoundId = this.roundId;
 
-    // Track recent results (max 20)
     this.recentResults = [result, ...this.recentResults.slice(0, 19)];
 
     this.phase = 'spinning';
     this.broadcastGameState();
     this.server.emit('spinResult', { result, roundId: currentRoundId });
 
-    // Process all pending bets in parallel
     const betEntries = Array.from(this.pendingBets.entries());
     await Promise.all(
       betEntries.map(async ([userId, bets]) => {
@@ -145,7 +140,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             }
           }
         } catch {
-          // Ignore individual bet errors
+          // 개별 베팅 오류는 다른 유저에게 영향 없도록 무시
         }
       }),
     );

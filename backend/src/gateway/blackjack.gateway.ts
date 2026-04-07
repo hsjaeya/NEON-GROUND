@@ -67,7 +67,6 @@ export class BlackjackGateway implements OnGatewayConnection, OnGatewayDisconnec
     // Sessions persist so players can reconnect
   }
 
-  // ── Events ───────────────────────────────────────────────────────────
 
   @SubscribeMessage('placeBet')
   async onPlaceBet(client: Socket, data: { amount: number }) {
@@ -202,7 +201,6 @@ export class BlackjackGateway implements OnGatewayConnection, OnGatewayDisconnec
     client.emit('gameState', this.serialize(user.id, false));
   }
 
-  // ── Helpers ──────────────────────────────────────────────────────────
 
   private async runDealer(userId: number, client: Socket) {
     const session = this.sessions.get(userId)!;

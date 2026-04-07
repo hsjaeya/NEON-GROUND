@@ -97,7 +97,6 @@ const Register: React.FC = () => {
         <div className={`${styles.cornerAccent} ${styles.bottomLeft}`} />
         <div className={`${styles.cornerAccent} ${styles.bottomRight}`} />
 
-        {/* Header */}
         <div className={styles.authHeader}>
           <div className={styles.authLogo}>◇ NEON GROUND ◇</div>
           <h1 className={styles.authTitle}>
@@ -106,21 +105,17 @@ const Register: React.FC = () => {
           <p className={styles.authSubtitle}>// initialize system access //</p>
         </div>
 
-        {/* Success Message */}
         {success && (
           <div className={styles.successBox}>
             ✓ ACCOUNT CREATED SUCCESSFULLY · INITIALIZING VAULT...
           </div>
         )}
 
-        {/* Error Message */}
         {(error || authError) && (
           <div className={styles.errorBox}>✗ {error || authError}</div>
         )}
 
-        {/* Form */}
         <form className={styles.authForm} onSubmit={handleSubmit}>
-          {/* Username Field */}
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>USERNAME</label>
             <input
@@ -134,7 +129,6 @@ const Register: React.FC = () => {
             />
           </div>
 
-          {/* Email Field */}
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>EMAIL ADDRESS</label>
             <input
@@ -148,7 +142,6 @@ const Register: React.FC = () => {
             />
           </div>
 
-          {/* Password Field */}
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>PASSWORD</label>
             <input
@@ -162,7 +155,6 @@ const Register: React.FC = () => {
             />
           </div>
 
-          {/* Confirm Password Field */}
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>CONFIRM PASSWORD</label>
             <input
@@ -176,7 +168,6 @@ const Register: React.FC = () => {
             />
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className={styles.submitBtn}
@@ -199,10 +190,8 @@ const Register: React.FC = () => {
           </button>
         </form>
 
-        {/* Divider */}
         <div style={{ margin: "24px 0" }} className={styles.divider} />
 
-        {/* Footer Link */}
         <div className={styles.footerLink}>
           ALREADY HAVE ACCOUNT?
           <Link to="/login">SIGN IN</Link>

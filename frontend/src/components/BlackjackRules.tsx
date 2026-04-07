@@ -16,7 +16,6 @@ export default function BlackjackRules() {
 
   return (
     <>
-      {/* 도움말 버튼 */}
       <button
         onClick={() => setIsOpen(true)}
         style={{

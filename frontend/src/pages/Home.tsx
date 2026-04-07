@@ -192,7 +192,6 @@ export default function Home() {
     }
   }, [user?.id]);
 
-  // Countdown timer
   useEffect(() => {
     if (!dailyBonus?.nextClaimAt) return;
     const tick = () => {
@@ -261,7 +260,6 @@ export default function Home() {
     navigate("/");
   };
 
-  // 로그인 안 됨 - Landing 화면
   if (!user) {
     return (
       <div className={styles.root}>
@@ -270,7 +268,6 @@ export default function Home() {
 
         {loginPrompt && <LoginPromptModal onClose={() => setLoginPrompt(false)} />}
 
-        {/* HUD */}
         <header className={styles.hud}>
           <div className={styles.hudLogo}>
             <div className={styles.hudDot} />
@@ -284,9 +281,7 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Main */}
         <main className={styles.main}>
-          {/* Title */}
           <div className={styles.titleBlock}>
             <p className={styles.titleEyebrow}>// WELCOME TO THE VAULT //</p>
             <h1 className={styles.title}>
@@ -299,7 +294,6 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Games */}
           <section className={styles.section}>
             <SectionLabel text="GAME MODULES" />
             <div className={styles.gameGrid}>
@@ -316,12 +310,10 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Divider */}
           <div className={styles.divider}>
             <span className={styles.dividerDiamond}>◆</span>
           </div>
 
-          {/* System */}
           <section className={styles.section}>
             <SectionLabel text="SYSTEM ACCESS" />
             <div className={styles.utilRow}>
@@ -335,7 +327,6 @@ export default function Home() {
           </section>
         </main>
 
-        {/* Footer */}
         <footer className={styles.footer}>
           <span>SYS.STATUS :: ONLINE · VAULT LOCKED</span>
           <div className={styles.pulseBars}>
@@ -353,7 +344,6 @@ export default function Home() {
     );
   }
 
-  // 로그인 됨 - Game Hub 화면
   const UTILS: Util[] = [
     { to: "/profile", label: "PROFILE" },
     { to: "/ranking", label: "RANKING" },
@@ -365,7 +355,6 @@ export default function Home() {
       <div className={styles.scanlines} />
       <div className={styles.dotGrid} />
 
-      {/* HUD */}
       <header className={styles.hud}>
         <div className={styles.hudLogo}>
           <div className={styles.hudDot} />
@@ -388,9 +377,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main */}
       <main className={styles.main}>
-        {/* Title */}
         <div className={styles.titleBlock}>
           <p className={styles.titleEyebrow}>// SELECT INTERFACE //</p>
           <h1 className={styles.title}>
@@ -403,7 +390,6 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Games */}
         <section className={styles.section}>
           <SectionLabel text="GAME MODULES" />
           <div className={styles.gameGrid}>
@@ -419,12 +405,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Divider */}
         <div className={styles.divider}>
           <span className={styles.dividerDiamond}>◆</span>
         </div>
 
-        {/* System */}
         <section className={styles.section}>
           <SectionLabel text="SYSTEM" />
           <div className={styles.utilRow}>
@@ -441,7 +425,6 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Footer */}
       <footer className={styles.footer}>
         <span>SYS.STATUS :: ONLINE · LUCK ENGINE ACTIVE</span>
         <div className={styles.pulseBars}>

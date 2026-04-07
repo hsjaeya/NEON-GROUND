@@ -5,17 +5,12 @@ import { AuthProvider, useAuth } from "./context/Authcontext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Resister";
-import MakeMoney from "./pages/Makemoney";
 import Roulette from "./pages/Roulette";
 import Blackjack from "./pages/Blackjack";
 import PokerLobby from "./pages/PokerLobby";
-import PokerRoom from "./pages/PokerRoom";
 import Ranking from "./pages/Ranking";
 import Profile from "./pages/Profile";
 
-// import other game pages...
-
-// Protected Route Component
 interface ProtectedRouteProps {
   children: ReactNode;
 }
@@ -50,7 +45,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   return <>{children}</>;
 };
 
-// Public Route Component - redirect to home if already logged in
 interface PublicRouteProps {
   children: ReactNode;
 }
@@ -70,10 +64,8 @@ function App(): React.ReactElement {
     <AuthProvider>
       <div className="App">
         <Routes>
-          {/* Home - shows Landing if not logged in, Home if logged in */}
-          <Route path="/" element={<Home />} />
+            <Route path="/" element={<Home />} />
 
-          {/* Auth Routes */}
           <Route
             path="/login"
             element={
@@ -109,31 +101,11 @@ function App(): React.ReactElement {
             }
           />
 
-          {/* Protected Game Routes - uncomment as you add games */}
-          {/*
-
-          <Route
-            path="/slotMachine"
-            element={
-              <ProtectedRoute>
-                <SlotMachine />
-              </ProtectedRoute>
-            }
-          />
-          */}
           <Route
             path="/poker"
             element={
               <ProtectedRoute>
                 <PokerLobby />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/poker/room/:roomId"
-            element={
-              <ProtectedRoute>
-                <PokerRoom />
               </ProtectedRoute>
             }
           />
@@ -153,34 +125,6 @@ function App(): React.ReactElement {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/makeMoney"
-            element={
-              <ProtectedRoute>
-                <MakeMoney />
-              </ProtectedRoute>
-            }
-          />
-          {/* 
-          <Route
-            path="/donate"
-            element={
-              <ProtectedRoute>
-                <Donate />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/setting"
-            element={
-              <ProtectedRoute>
-                <Setting />
-              </ProtectedRoute>
-            }
-          />
-          */}
-
-          {/* 404 Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

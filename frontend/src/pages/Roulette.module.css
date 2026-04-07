@@ -1,6 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap");
 
-/* ───────────────────────────
    ROOT
 ─────────────────────────── */
 .root {
@@ -15,7 +14,6 @@
   overflow: hidden;
 }
 
-/* ───────────────────────────
    OVERLAYS
 ─────────────────────────── */
 .scanlines {
@@ -44,7 +42,6 @@
   background-size: 32px 32px;
 }
 
-/* ───────────────────────────
    HEADER
 ─────────────────────────── */
 .header {
@@ -116,7 +113,6 @@
   text-shadow: 0 0 8px rgba(0, 255, 200, 0.6);
 }
 
-/* ───────────────────────────
    MAIN
 ─────────────────────────── */
 .main {
@@ -136,7 +132,6 @@
   overflow: hidden;
 }
 
-/* ───────────────────────────
    WHEEL SECTION
 ─────────────────────────── */
 .wheelSection {
@@ -254,7 +249,6 @@
     inset 0 0 16px rgba(255, 0, 144, 0.3);
 }
 
-/* ───────────────────────────
    RESULT BOX
 ─────────────────────────── */
 .resultBox {
@@ -326,7 +320,6 @@
   text-shadow: 0 0 12px #ff0055;
 }
 
-/* ───────────────────────────
    HISTORY
 ─────────────────────────── */
 .historyBox {
@@ -380,7 +373,6 @@
   border: 1px solid rgba(0, 255, 136, 0.3);
 }
 
-/* ───────────────────────────
    BETTING SECTION
 ─────────────────────────── */
 .bettingSection {
@@ -401,7 +393,6 @@
   margin-bottom: 8px;
 }
 
-/* ───────────────────────────
    CHIP SELECTOR
 ─────────────────────────── */
 .chipSelector {
@@ -446,7 +437,6 @@
   box-shadow: 0 0 16px rgba(0, 255, 200, 0.4);
 }
 
-/* ───────────────────────────
    BETTING TABLE
 ─────────────────────────── */
 .bettingTable {
@@ -455,7 +445,6 @@
   gap: 12px;
 }
 
-/* ───────────────────────────
    BETTING TABLE
 ─────────────────────────── */
 .bettingTable {
@@ -631,7 +620,6 @@
   box-shadow: 0 0 16px rgba(0, 255, 200, 0.4);
 }
 
-/* ───────────────────────────
    CURRENT BETS
 ─────────────────────────── */
 .currentBets {
@@ -725,7 +713,6 @@
   letter-spacing: 0.15em;
 }
 
-/* ───────────────────────────
    ACTIONS
 ─────────────────────────── */
 .actions {
@@ -794,7 +781,6 @@
   transform: none;
 }
 
-/* ───────────────────────────
    SLOT WINNING
 ─────────────────────────── */
 .slotWinning {
@@ -803,7 +789,6 @@
   z-index: 5;
 }
 
-/* ───────────────────────────
    SESSION BAR
 ─────────────────────────── */
 .sessionBar {
@@ -892,7 +877,6 @@
 
 .stopAutoBtn:hover { background: rgba(255, 40, 80, 0.35); }
 
-/* ───────────────────────────
    CELEBRATION OVERLAY
 ─────────────────────────── */
 .celebrationOverlay {
@@ -955,7 +939,6 @@
   color: rgba(255, 210, 100, 0.7);
 }
 
-/* ───────────────────────────
    NEAR MISS
 ─────────────────────────── */
 .nearMissInline {
@@ -978,7 +961,6 @@
   animation: nearMissPulse 0.6s ease 3;
 }
 
-/* ───────────────────────────
    HOT NUMBERS
 ─────────────────────────── */
 .cellHot {
@@ -1007,7 +989,6 @@
   box-shadow: 0 0 8px rgba(255, 140, 0, 0.5);
 }
 
-/* ───────────────────────────
    AUTO SPIN SECTION
 ─────────────────────────── */
 .autoSpinSection {
@@ -1044,7 +1025,6 @@
 
 .autoSpinBtn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-/* ───────────────────────────
    REBET BUTTON
 ─────────────────────────── */
 .rebetBtn {
@@ -1068,7 +1048,6 @@
 
 .rebetBtn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-/* ───────────────────────────
    KEYFRAMES
 ─────────────────────────── */
 @keyframes slideIn {
@@ -1123,7 +1102,6 @@
   to   { filter: brightness(1.4) drop-shadow(0 0 6px rgba(255, 140, 0, 0.6)); }
 }
 
-/* ───────────────────────────
    RESPONSIVE
 ─────────────────────────── */
 @media (max-width: 1200px) {
@@ -1217,7 +1195,6 @@
   background: rgba(0, 255, 200, 0.5);
 }
 
-/* ───────────────────────────
    HEADER RIGHT + CONNECTION
 ─────────────────────────── */
 .headerRight {
@@ -1233,7 +1210,6 @@
   flex-shrink: 0;
 }
 
-/* ───────────────────────────
    TIMER
 ─────────────────────────── */
 .timerSection {
@@ -1300,7 +1276,6 @@
   pointer-events: none;
 }
 
-/* ───────────────────────────
    CHAT
 ─────────────────────────── */
 .chatSection {
@@ -1313,7 +1288,6 @@
   overflow: hidden;
 }
 
-/* ── Tab Bar ──────────────────────────────────────────────────────── */
 .chatTabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1408,7 +1382,6 @@
   box-shadow: 0 0 6px rgba(0, 255, 200, 0.2);
 }
 
-/* ── Player List Panel ────────────────────────────────────────────── */
 .playerList {
   flex: 1;
   overflow-y: auto;

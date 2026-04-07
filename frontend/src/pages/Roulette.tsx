@@ -60,7 +60,6 @@ export default function Roulette() {
   const navigate = useNavigate();
   const user = authUser as UserWithBalance | null;
 
-  // Core game state
   const [bets, setBets] = useState<Bet[]>([]);
   const [chipValue, setChipValue] = useState(1000);
   const [spinning, setSpinning] = useState(false);
@@ -70,45 +69,38 @@ export default function Roulette() {
   const [history, setHistory] = useState<number[]>([]);
   const [localBalance, setLocalBalance] = useState<number | null>(null);
 
-  // Session stats
   const [sessionSpins, setSessionSpins] = useState(0);
   const [sessionNet, setSessionNet] = useState(0);
   const [sessionWins, setSessionWins] = useState(0);
   const [winStreak, setWinStreak] = useState(0);
   const [lossStreak, setLossStreak] = useState(0);
 
-  // Casino effects
   const [lastBets, setLastBets] = useState<Bet[]>([]);
   const [celebration, setCelebration] = useState<CelebrationLevel>("none");
 
-  // Multiplayer timer state
   const [phase, setPhase] = useState<Phase>("betting");
   const [timeLeft, setTimeLeft] = useState(15);
   const [roundId, setRoundId] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [connected, setConnected] = useState(false);
 
-  // Chat state
   const [chatMessages, setChatMessages] = useState<ChatMsg[]>([]);
   const [chatInput, setChatInput] = useState("");
 
-  // Room users
   const [roomUsers, setRoomUsers] = useState<{ count: number; usernames: string[] }>({ count: 0, usernames: [] });
   const [activeTab, setActiveTab] = useState<"chat" | "players">("chat");
 
-  // Refs
   const socketRef = useRef<Socket | null>(null);
   const betsRef = useRef<Bet[]>([]);
   const roundIdRef = useRef(0);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  // Pending bet result — applied after wheel animation completes
+  // 베팅 결과는 휠 애니메이션(6s) 완료 후 적용
   const pendingBetResultRef = useRef<{
     totalWin: number;
     newBalance: number;
     totalBet: number;
   } | null>(null);
 
-  // Keep refs in sync
   useEffect(() => {
     betsRef.current = bets;
   }, [bets]);
@@ -116,7 +108,6 @@ export default function Roulette() {
     roundIdRef.current = roundId;
   }, [roundId]);
 
-  // Auth redirect
   useEffect(() => {
     if (!user) {
       navigate("/login");
@@ -127,7 +118,6 @@ export default function Roulette() {
     }
   }, [user, navigate]);
 
-  // Socket connection
   useEffect(() => {
     if (!user) return;
     const token =
@@ -146,12 +136,10 @@ export default function Roulette() {
     socket.on("connect", () => setConnected(true));
     socket.on("disconnect", () => setConnected(false));
 
-    // Restore chat history for late joiners
     socket.on("chatHistory", (msgs: ChatMsg[]) => {
       setChatMessages(msgs.slice(-50));
     });
 
-    // Restore spin history for late joiners (max 20)
     socket.on("recentResults", (results: number[]) => {
       setHistory(results.slice(0, 20));
     });
@@ -205,7 +193,6 @@ export default function Roulette() {
         WHEEL_ORDER.length;
       setRotation(360 * 10 + slotsToRotate * degreePerSlot);
 
-      // After wheel animation (6s), show result + apply pending bet result
       setTimeout(() => {
         setResult(winningNumber);
         setHistory((prev) => {
@@ -246,7 +233,6 @@ export default function Roulette() {
       }, 6100);
     });
 
-    // Store bet result — displayed after wheel animation
     socket.on(
       "betResult",
       (data: { totalWin: number; newBalance: number; totalBet: number }) => {
@@ -268,12 +254,11 @@ export default function Roulette() {
     };
   }, [user]);
 
-  // Auto-scroll chat
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
 
-  // Hot numbers: appeared 2+ times in last 20 results
+  // 최근 20회 중 2번 이상 출현한 핫 넘버
   const hotNumbers = useMemo(() => {
     const counts = new Map<number, number>();
     history.forEach((n) => counts.set(n, (counts.get(n) || 0) + 1));
@@ -318,7 +303,6 @@ export default function Roulette() {
       return;
     }
 
-    // 완전히 동일한 베팅이 있으면 칩 누적
     const numSet = new Set(numbers);
     const dupIdx = bets.findIndex(
       (b) =>
@@ -431,7 +415,6 @@ export default function Roulette() {
       <div className={styles.scanlines} />
       <div className={styles.dotGrid} />
 
-      {/* Win Celebration Overlay */}
       {celebration !== "none" && (
         <div
           className={`${styles.celebrationOverlay} ${styles[`celebration${celebration.charAt(0).toUpperCase() + celebration.slice(1)}`]}`}
@@ -469,7 +452,6 @@ export default function Roulette() {
 
       <RouletteRules />
 
-      {/* Header */}
       <header className={styles.header}>
         <button onClick={() => navigate("/home")} className={styles.backBtn}>
           ← BACK
@@ -492,7 +474,6 @@ export default function Roulette() {
         </div>
       </header>
 
-      {/* Session Stats Bar */}
       {sessionSpins > 0 && (
         <div className={styles.sessionBar}>
           <div className={styles.sessionStat}>
@@ -525,9 +506,7 @@ export default function Roulette() {
       )}
 
       <main className={styles.main}>
-        {/* Wheel Section */}
         <div className={styles.wheelSection}>
-          {/* Timer */}
           <div className={styles.timerSection}>
             <div className={styles.timerPhase} style={{ color: timerColor }}>
               {phaseLabel[phase]}
@@ -611,7 +590,6 @@ export default function Roulette() {
             </div>
           </div>
 
-          {/* Result Display */}
           {result !== null && (
             <div className={styles.resultBox}>
               <div className={styles.resultLabel}>RESULT</div>
@@ -631,7 +609,6 @@ export default function Roulette() {
             </div>
           )}
 
-          {/* History — hidden while result is showing */}
           {history.length > 0 && result === null && (
             <div className={styles.historyBox}>
               <div className={styles.historyLabel}>
@@ -654,9 +631,7 @@ export default function Roulette() {
           )}
         </div>
 
-        {/* Betting Section */}
         <div className={styles.bettingSection}>
-          {/* Chip Selector */}
           <div className={styles.chipSelector}>
             <div className={styles.sectionLabel}>CHIP VALUE</div>
             <div className={styles.chips}>
@@ -673,7 +648,6 @@ export default function Roulette() {
             </div>
           </div>
 
-          {/* Betting Table */}
           <div className={styles.bettingTable}>
             <div className={styles.sectionLabel}>
               BETTING TABLE{" "}
@@ -691,7 +665,6 @@ export default function Roulette() {
               )}
             </div>
             <div className={styles.tableLayout}>
-              {/* 0 — spans all 3 number rows */}
               <div
                 className={`${styles.numberCell} ${styles.cellGreen} ${styles.zeroNum} ${!canBet ? styles.cellDisabled : ""}`}
                 style={{ gridRow: "1 / 4", gridColumn: "1" }}
@@ -700,7 +673,6 @@ export default function Roulette() {
                 <span>0</span>
               </div>
 
-              {/* Numbers 1–36: row 3 (top), 2 (mid), 1 (bot) */}
               {([3, 2, 1] as number[]).flatMap((row, rowIdx) =>
                 Array.from({ length: 12 }, (_, col) => {
                   const num = col * 3 + row;
@@ -720,7 +692,6 @@ export default function Roulette() {
                 })
               )}
 
-              {/* 2:1 column bet buttons — right side, one per row */}
               {([3, 2, 1] as number[]).map((row, rowIdx) => {
                 const colNums = Array.from({ length: 12 }, (_, i) => i * 3 + row);
                 return (
@@ -736,7 +707,6 @@ export default function Roulette() {
                 );
               })}
 
-              {/* Dozen bets — aligned under each third of the number grid */}
               {(
                 [
                   ["1ST 12", 1,  "2 / 6" ],
@@ -761,7 +731,6 @@ export default function Roulette() {
                 </button>
               ))}
 
-              {/* Even-money bets — each spans 2 number columns */}
               {(
                 [
                   { label: "1-18",  type: "lowhigh"  as BetType, nums: Array.from({ length: 18 }, (_, i) => i + 1),                                       col: "2 / 4",   cls: "" },
@@ -785,7 +754,6 @@ export default function Roulette() {
             </div>
           </div>
 
-          {/* Current Bets */}
           <div className={styles.currentBets}>
             <div className={styles.sectionLabel}>
               CURRENT BETS ({bets.length})
@@ -825,7 +793,6 @@ export default function Roulette() {
             )}
           </div>
 
-          {/* Actions */}
           <div className={styles.actions}>
             <button
               onClick={clearBets}
@@ -844,9 +811,7 @@ export default function Roulette() {
           </div>
         </div>
 
-        {/* Chat / Players Section */}
         <div className={styles.chatSection}>
-          {/* Tab Bar */}
           <div className={styles.chatTabs}>
             <button
               className={`${styles.chatTab} ${activeTab === "chat" ? styles.chatTabActive : ""}`}
@@ -867,7 +832,6 @@ export default function Roulette() {
             </button>
           </div>
 
-          {/* Chat Panel */}
           {activeTab === "chat" && (
             <>
               <div className={styles.chatMessages}>
@@ -900,7 +864,6 @@ export default function Roulette() {
             </>
           )}
 
-          {/* Players Panel */}
           {activeTab === "players" && (
             <div className={styles.playerList}>
               {roomUsers.usernames.length === 0 ? (

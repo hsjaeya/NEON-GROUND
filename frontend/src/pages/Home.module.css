@@ -1,6 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap");
 
-/* ───────────────────────────
    ROOT
 ─────────────────────────── */
 .root {
@@ -15,7 +14,6 @@
   overflow: hidden;
 }
 
-/* ───────────────────────────
    OVERLAYS
 ─────────────────────────── */
 .scanlines {
@@ -44,7 +42,6 @@
   background-size: 32px 32px;
 }
 
-/* ───────────────────────────
    HUD
 ─────────────────────────── */
 .hud {
@@ -118,7 +115,6 @@
   background: rgba(0, 255, 200, 0.15);
 }
 
-/* ───────────────────────────
    MAIN
 ─────────────────────────── */
 .main {
@@ -135,7 +131,6 @@
   box-sizing: border-box;
 }
 
-/* ───────────────────────────
    TITLE
 ─────────────────────────── */
 .titleBlock {
@@ -178,7 +173,6 @@
   color: rgba(160, 210, 255, 0.35);
 }
 
-/* ───────────────────────────
    SECTION LABEL
 ─────────────────────────── */
 .section {
@@ -206,7 +200,6 @@
   background: rgba(0, 255, 200, 0.12);
 }
 
-/* ───────────────────────────
    GAME CARDS
 ─────────────────────────── */
 .gameGrid {
@@ -357,7 +350,6 @@
   color: #ffcc00;
 }
 
-/* ───────────────────────────
    DIVIDER
 ─────────────────────────── */
 .divider {
@@ -384,7 +376,6 @@
   padding: 0 10px;
 }
 
-/* ───────────────────────────
    UTIL BUTTONS
 ─────────────────────────── */
 .utilRow {
@@ -435,7 +426,6 @@
   text-shadow: 0 0 8px rgba(255, 60, 60, 0.5);
 }
 
-/* ───────────────────────────
    DAILY BONUS
 ─────────────────────────── */
 .dailyBonusBtn {
@@ -467,7 +457,6 @@
 }
 
 
-/* ───────────────────────────
    FOOTER
 ─────────────────────────── */
 .footer {
@@ -499,7 +488,6 @@
   animation: pulseBar 1.2s ease infinite;
 }
 
-/* ───────────────────────────
    KEYFRAMES
 ─────────────────────────── */
 @keyframes blink {
@@ -522,7 +510,6 @@
   }
 }
 
-/* ───────────────────────────
    RESPONSIVE
 ─────────────────────────── */
 @media (max-width: 768px) {
@@ -551,12 +538,10 @@
   padding: 0;
 }
 
-/* ── Game Card Clickable (non-logged-in) ─────────────────────────── */
 .cardClickable {
   cursor: pointer;
 }
 
-/* ── Login Prompt Modal ──────────────────────────────────────────── */
 .modalOverlay {
   position: fixed;
   inset: 0;

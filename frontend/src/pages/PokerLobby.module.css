@@ -1,6 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap");
 
-/* ─────────────────────────────────── ROOT ─────────────────────────────────── */
 .root {
   min-height: 100vh;
   width: 100%;
@@ -36,7 +35,6 @@
   background-size: 32px 32px;
 }
 
-/* ─────────────────────────────────── HEADER ─────────────────────────────────── */
 .header {
   position: sticky;
   top: 0;
@@ -128,7 +126,6 @@
   background: rgba(0, 255, 200, 0.12);
 }
 
-/* ─────────────────────────────────── MAIN ─────────────────────────────────── */
 .main {
   position: relative;
   z-index: 10;
@@ -173,7 +170,6 @@
   animation: blinkAnim 1.2s ease infinite;
 }
 
-/* ─────────────────────────────────── LAYOUT ─────────────────────────────────── */
 .layout {
   display: grid;
   grid-template-columns: 300px 1fr;
@@ -181,7 +177,6 @@
   align-items: start;
 }
 
-/* ─────────────────────────────────── PANELS ─────────────────────────────────── */
 .createPanel,
 .roomListPanel {
   background: rgba(0, 12, 22, 0.75);
@@ -236,7 +231,6 @@
   text-shadow: 0 0 10px rgba(0, 255, 200, 0.4);
 }
 
-/* ─────────────────────────────────── FORM ─────────────────────────────────── */
 .formGroup {
   display: flex;
   flex-direction: column;
@@ -361,7 +355,6 @@
   background: rgba(255, 68, 102, 0.04);
 }
 
-/* ─────────────────────────────────── ROOM LIST ─────────────────────────────────── */
 .emptyState {
   display: flex;
   flex-direction: column;
@@ -388,7 +381,6 @@
   gap: 12px;
 }
 
-/* ─────────────────────────────────── ROOM CARD ─────────────────────────────────── */
 .roomCard {
   position: relative;
   padding: 16px 18px;
@@ -538,13 +530,11 @@
   cursor: default;
 }
 
-/* ─────────────────────────────────── ANIMATIONS ─────────────────────────────────── */
 @keyframes blinkAnim {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.35; }
 }
 
-/* ─────────────────────────────────── RESPONSIVE ─────────────────────────────────── */
 @media (max-width: 900px) {
   .header { padding: 0 20px; }
   .main { padding: 24px 20px 36px; }

@@ -1,4 +1,3 @@
-/* ── Root ─────────────────────────────────────────────────────────── */
 .root {
   min-height: 100vh;
   background: #050a0f;
@@ -10,7 +9,6 @@
   flex-direction: column;
 }
 
-/* ── Overlays ─────────────────────────────────────────────────────── */
 .scanlines {
   pointer-events: none;
   position: fixed;
@@ -33,7 +31,6 @@
   z-index: 9;
 }
 
-/* ── Header ───────────────────────────────────────────────────────── */
 .header {
   display: flex;
   align-items: center;
@@ -81,7 +78,6 @@
   width: 90px;
 }
 
-/* ── Main ─────────────────────────────────────────────────────────── */
 .main {
   flex: 1;
   padding: 32px 48px 48px;
@@ -91,7 +87,6 @@
   box-sizing: border-box;
 }
 
-/* ── Tabs ─────────────────────────────────────────────────────────── */
 .tabs {
   display: flex;
   gap: 8px;
@@ -121,14 +116,12 @@
   text-shadow: 0 0 8px rgba(0,255,200,0.5);
 }
 
-/* ── Table wrapper ────────────────────────────────────────────────── */
 .tableWrap {
   border: 1px solid rgba(0,255,200,0.2);
   background: rgba(5,14,28,0.85);
   overflow: hidden;
 }
 
-/* ── Status messages ──────────────────────────────────────────────── */
 .statusMsg {
   padding: 48px 24px;
   text-align: center;
@@ -144,7 +137,6 @@
   color: #ff4466;
 }
 
-/* ── Table ────────────────────────────────────────────────────────── */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -206,7 +198,6 @@
   color: #ff4466;
 }
 
-/* ── Pagination ───────────────────────────────────────────────────── */
 .pagination {
   display: flex;
   align-items: center;

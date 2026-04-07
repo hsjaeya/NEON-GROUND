@@ -209,7 +209,6 @@ export default function Profile() {
 
         {!loading && !error && profile && (
           <>
-            {/* ID Card */}
             <div className={styles.idCard}>
               <div className={styles.idCornerTL} />
               <div className={styles.idCornerTR} />
@@ -263,7 +262,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Edit Form */}
             {editing && (
               <form className={styles.editForm} onSubmit={handleSave}>
                 <div className={styles.editFormTitle}>
@@ -292,9 +290,6 @@ export default function Profile() {
                     required
                   />
                 </div>
-
-                {/* <div className={styles.editDivider} />
-                <div className={styles.editPasswordNote}>NEW PASSWORD (선택 사항)</div> */}
 
                 <div className={styles.editField}>
                   <label className={styles.editLabel}>NEW PASSWORD</label>
@@ -346,12 +341,10 @@ export default function Profile() {
               </form>
             )}
 
-            {/* Stats */}
             {profile.stats ? (
               <div className={styles.section}>
                 <div className={styles.sectionTitle}>GAME STATS</div>
 
-                {/* Win Rate Bar */}
                 <div className={styles.winRateWrap}>
                   <div className={styles.winRateHeader}>
                     <span className={styles.winRateLabel}>WIN RATE</span>
@@ -369,7 +362,6 @@ export default function Profile() {
                   </div>
                 </div>
 
-                {/* Row 1: Games / Wins / Losses */}
                 <div className={styles.statsGrid}>
                   <StatBox
                     label="GAMES PLAYED"
@@ -390,7 +382,6 @@ export default function Profile() {
                   />
                 </div>
 
-                {/* Net Profit Hero */}
                 {(() => {
                   const isPos = profile.stats.netProfit >= 0;
                   return (
@@ -420,7 +411,6 @@ export default function Profile() {
                   );
                 })()}
 
-                {/* Row 2: Wagered / Payout */}
                 <div className={styles.statsGrid2}>
                   <StatBox
                     label="TOTAL WAGERED"
@@ -446,14 +436,12 @@ export default function Profile() {
               </div>
             )}
 
-            {/* Quick links */}
             <div className={styles.links}>
               <Link to="/ranking" className={styles.linkBtn}>
                 RANKING
               </Link>
             </div>
 
-            {/* Delete Account */}
             <div className={styles.deleteZone}>
               <button className={styles.deleteBtn} onClick={() => setDeleteConfirm(true)}>
                 WITHDRAW ACCOUNT
@@ -463,7 +451,6 @@ export default function Profile() {
         )}
       </main>
 
-      {/* Delete Confirm Modal */}
       {deleteConfirm && (
         <div className={styles.deleteOverlay} onClick={() => setDeleteConfirm(false)}>
           <div className={styles.deleteModal} onClick={(e) => e.stopPropagation()}>

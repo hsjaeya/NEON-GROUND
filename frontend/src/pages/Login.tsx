@@ -72,7 +72,6 @@ const Login: React.FC = () => {
         <div className={`${styles.cornerAccent} ${styles.bottomLeft}`} />
         <div className={`${styles.cornerAccent} ${styles.bottomRight}`} />
 
-        {/* Header */}
         <div className={styles.authHeader}>
           <div className={styles.authLogo}>◇ NEON GROUND ◇</div>
           <h1 className={styles.authTitle}>
@@ -81,21 +80,17 @@ const Login: React.FC = () => {
           <p className={styles.authSubtitle}>// authenticate user //</p>
         </div>
 
-        {/* Success Message */}
         {success && (
           <div className={styles.successBox}>
             ✓ AUTHENTICATION SUCCESSFUL · GRANTING ACCESS...
           </div>
         )}
 
-        {/* Error Message */}
         {(error || authError) && (
           <div className={styles.errorBox}>✗ {error || authError}</div>
         )}
 
-        {/* Form */}
         <form className={styles.authForm} onSubmit={handleSubmit}>
-          {/* Email Field */}
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>EMAIL ADDRESS</label>
             <input
@@ -109,7 +104,6 @@ const Login: React.FC = () => {
             />
           </div>
 
-          {/* Password Field */}
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>PASSWORD</label>
             <input
@@ -123,7 +117,6 @@ const Login: React.FC = () => {
             />
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className={styles.submitBtn}
@@ -146,10 +139,8 @@ const Login: React.FC = () => {
           </button>
         </form>
 
-        {/* Divider */}
         <div style={{ margin: "24px 0" }} className={styles.divider} />
 
-        {/* Footer Link */}
         <div className={styles.footerLink}>
           NO ACCOUNT YET?
           <Link to="/register">CREATE ONE</Link>

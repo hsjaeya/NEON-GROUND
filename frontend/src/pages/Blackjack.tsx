@@ -105,11 +105,10 @@ export default function Blackjack() {
 
     socket.on("gameState", (state: GameState) => {
       setGs(prev => {
-        // New hand started — trigger deal animation
+        // idle → player 전환 시 딜 애니메이션 트리거
         if (prev?.phase === "idle" && state.phase === "player") {
           setDealKey(k => k + 1);
         }
-        // Result came in — refresh balance
         if (state.phase === "result") {
           refreshUser();
         }
@@ -175,7 +174,6 @@ export default function Blackjack() {
 
       <BlackjackRules />
 
-      {/* Header */}
       <header className={styles.header}>
         <Link to="/" className={styles.backBtn}>← BACK</Link>
         <div className={styles.headerTitle}>
@@ -189,11 +187,9 @@ export default function Blackjack() {
       </header>
 
       <main className={styles.main}>
-        {/* TABLE */}
         <div className={styles.tableWrap}>
           <div className={styles.table}>
 
-            {/* Dealer zone */}
             <div className={styles.dealerZone}>
               <div className={styles.zoneLabel}>
                 DEALER
@@ -218,7 +214,6 @@ export default function Blackjack() {
 
             <div className={styles.tableDivider} />
 
-            {/* Center info */}
             <div className={styles.tableCenter}>
               {gs.phase === "idle" && (
                 <div className={styles.payoutTable}>
@@ -248,7 +243,6 @@ export default function Blackjack() {
 
             <div className={styles.tableDivider} />
 
-            {/* Player zone */}
             <div className={styles.playerZone}>
               <div className={styles.cardRow}>
                 {gs.phase === "idle" ? (
@@ -275,10 +269,8 @@ export default function Blackjack() {
           </div>
         </div>
 
-        {/* CONTROLS */}
         <div className={styles.controls}>
 
-          {/* Betting phase */}
           {gs.phase === "idle" && (
             <div className={styles.betPanel}>
               <div className={styles.betPanelTop}>
@@ -330,7 +322,6 @@ export default function Blackjack() {
             </div>
           )}
 
-          {/* Player action phase */}
           {gs.phase === "player" && (
             <div className={styles.actionPanel}>
               <button className={`${styles.btnAction} ${styles.btnHit}`} onClick={() => send("hit")}>
@@ -349,7 +340,6 @@ export default function Blackjack() {
             </div>
           )}
 
-          {/* Dealer playing */}
           {gs.phase === "dealer" && (
             <div className={styles.dealerPlaying}>
               <span className={styles.dealerPlayingDot} />
@@ -357,7 +347,6 @@ export default function Blackjack() {
             </div>
           )}
 
-          {/* Result */}
           {gs.phase === "result" && (
             <div className={styles.resultPanel}>
               <button className={styles.btnNewGame} onClick={handleNewGame}>

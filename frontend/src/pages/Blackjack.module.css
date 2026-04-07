@@ -1,6 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap");
 
-/* ── Root & Overlays ─────────────────────────────────────────────────── */
 .root {
   min-height: 100vh;
   width: 100%;
@@ -25,7 +24,6 @@
   background-size: 28px 28px;
 }
 
-/* ── Loading ─────────────────────────────────────────────────────────── */
 .loading {
   min-height: 100vh; display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 20px; background: #030810;
@@ -35,7 +33,6 @@
   letter-spacing: 0.4em; color: #00ffc8; text-shadow: 0 0 16px rgba(0,255,200,0.5);
 }
 
-/* ── Header ──────────────────────────────────────────────────────────── */
 .header {
   position: relative; z-index: 10;
   display: flex; align-items: center; justify-content: space-between;
@@ -86,7 +83,6 @@
   text-shadow: 0 0 8px rgba(0,255,200,0.6);
 }
 
-/* ── Main ────────────────────────────────────────────────────────────── */
 .main {
   position: relative; z-index: 10;
   flex: 1;
@@ -95,7 +91,6 @@
   gap: 16px;
 }
 
-/* ── Table ───────────────────────────────────────────────────────────── */
 .tableWrap { width: 100%; max-width: 680px; }
 
 .table {
@@ -128,7 +123,6 @@
   border-left: 2px solid rgba(0,255,200,0.7);
 }
 
-/* ── Table zones ─────────────────────────────────────────────────────── */
 .dealerZone, .playerZone {
   position: relative; z-index: 1;
   display: flex; flex-direction: column; gap: 10px;
@@ -164,10 +158,8 @@
   min-height: 60px; padding: 4px 0;
 }
 
-/* ── Card Row ────────────────────────────────────────────────────────── */
 .cardRow { display: flex; gap: 8px; flex-wrap: wrap; }
 
-/* ── Playing Card — Holographic Dark ────────────────────────────────── */
 .card {
   width: 66px; height: 94px;
   background: #091828;
@@ -247,7 +239,6 @@
   text-shadow: 0 0 10px #00ddcc, 0 0 20px rgba(0,255,238,0.4);
 }
 
-/* ── Value Badge ─────────────────────────────────────────────────────── */
 .valueBadge {
   display: inline-flex; align-items: center; justify-content: center;
   min-width: 30px; height: 22px; padding: 0 8px;
@@ -269,7 +260,6 @@
   text-shadow: 0 0 10px rgba(255,204,0,0.7);
 }
 
-/* ── Payout Table ────────────────────────────────────────────────────── */
 .payoutTable { display: flex; flex-direction: column; gap: 5px; }
 .payoutRow {
   display: flex; gap: 24px; justify-content: space-between;
@@ -283,7 +273,6 @@
 }
 .payoutNote { font-size: 7px; letter-spacing: 0.2em; color: rgba(0,255,200,0.35); margin-top: 4px; }
 
-/* ── Bet Display ─────────────────────────────────────────────────────── */
 .betDisplay {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
 }
@@ -294,7 +283,6 @@
   letter-spacing: 0.05em;
 }
 
-/* ── Result Banner ───────────────────────────────────────────────────── */
 .resultBanner {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   padding: 14px 32px;
@@ -319,7 +307,6 @@
 .netPos { color: #ffdd44; text-shadow: 0 0 14px rgba(255,204,0,0.8); }
 .netNeg { color: #ff44bb; text-shadow: 0 0 14px rgba(255,34,136,0.7); }
 
-/* ── Controls ────────────────────────────────────────────────────────── */
 .controls { width: 100%; max-width: 680px; }
 
 /* Betting panel */
@@ -461,7 +448,6 @@
   box-shadow: 0 0 28px rgba(0,255,200,0.3);
 }
 
-/* ── Footer ──────────────────────────────────────────────────────────── */
 .footer {
   position: relative; z-index: 10;
   display: flex; align-items: center; justify-content: center;
@@ -475,14 +461,12 @@
 }
 .backLink:hover { color: #00ffc8; }
 
-/* ── Error ───────────────────────────────────────────────────────────── */
 .errorMsg {
   font-size: 8px; letter-spacing: 0.22em;
   color: #ff44bb; padding: 6px 0; text-align: center;
   text-shadow: 0 0 8px rgba(255,34,136,0.5);
 }
 
-/* ── Animations ──────────────────────────────────────────────────────── */
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.1; }
