@@ -3,6 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
+import { UserResponseDto } from './dto/user-response.dto';
 const DAILY_BONUS_AMOUNT = 100000;
 import { PrismaService } from 'src/prisma/prisma.service';
 import { hash } from 'bcrypt';
@@ -28,7 +30,7 @@ export class UserService {
 
     const hashedPassword = await hash(password, 10);
 
-    const user = await this.prisma.user.create({
+    const created = await this.prisma.user.create({
       data: {
         email,
         username,
@@ -42,7 +44,7 @@ export class UserService {
       include: { wallets: true },
     });
 
-    return user;
+    return plainToInstance(UserResponseDto, created, { excludeExtraneousValues: true });
   }
 
   async getUser(userId: number) {

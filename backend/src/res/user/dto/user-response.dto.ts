@@ -11,21 +11,21 @@ import { WalletDto } from './wallet.dto';
 export class UserResponseDto {
   @Expose()
   @IsNumber()
-  id: number;
+  id!: number;
 
   @Expose()
   @IsEmail()
-  email: string;
+  email!: string;
 
   @Expose()
   @IsString()
-  username: string;
+  username!: string;
 
   @Expose()
   @IsDate()
-  createdAt: Date;
+  createdAt!: Date;
 
   @Expose()
   @Type(() => WalletDto)
-  wallets: WalletDto[];
+  wallets!: WalletDto[];
 }

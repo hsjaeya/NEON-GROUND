@@ -4,21 +4,21 @@ import { IsNumber, IsString, IsDate } from 'class-validator';
 export class WalletDto {
   @Expose()
   @IsNumber()
-  id: number;
+  id!: number;
 
   @Expose()
   @IsNumber()
-  userId: number;
+  userId!: number;
 
   @Expose()
   @IsString()
-  balance: string;
+  balance!: string;
 
   @Expose()
   @IsDate()
-  createdAt: Date;
+  createdAt!: Date;
 
   @Expose()
   @IsDate()
-  updatedAt: Date;
+  updatedAt!: Date;
 }
