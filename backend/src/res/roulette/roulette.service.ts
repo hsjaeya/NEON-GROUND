@@ -1,5 +1,6 @@
 
 import { Injectable, BadRequestException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RouletteSpinDto, BetType } from './dto/roulette-bet.dto';
 import { Decimal } from '@prisma/client/runtime/client';
@@ -185,7 +186,7 @@ export class RouletteService {
       };
     });
 
-    // 잔액 읽기와 차감을 하나의 트랜잭션으로 처리하여 race condition 방지
+    // Serializable 격리로 동시 요청 시 잔액 이중 차감 방지
     const { game, newBalance } = await this.prisma.$transaction(async (tx) => {
       const wallet = await tx.wallet.findFirst({ where: { userId } });
       if (!wallet) throw new BadRequestException('Wallet not found');
@@ -222,7 +223,7 @@ export class RouletteService {
       });
 
       return { game, newBalance: updatedBalance };
-    });
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 
     const totalWinNum = totalWin.toNumber();
     this.stats.recordGame(userId, totalBet, totalWinNum).catch(() => {});
@@ -265,7 +266,7 @@ export class RouletteService {
       return { type: bet.type, numbers: bet.numbers, amount: bet.amount, won, payout: payout.toNumber() };
     });
 
-    // 잔액 읽기와 차감을 하나의 트랜잭션으로 처리하여 race condition 방지
+    // Serializable 격리로 동시 요청 시 잔액 이중 차감 방지
     const newBalance = await this.prisma.$transaction(async (tx) => {
       const wallet = await tx.wallet.findFirst({ where: { userId } });
       if (!wallet) return null;
@@ -294,7 +295,7 @@ export class RouletteService {
       });
 
       return updatedBalance;
-    });
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 
     if (newBalance === null) return null;
 

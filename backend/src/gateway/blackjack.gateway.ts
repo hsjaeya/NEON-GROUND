@@ -8,6 +8,7 @@ import { BlackjackService, Card } from '../res/blackjack/blackjack.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { StatsService } from '../res/stats/stats.service';
 import { Decimal } from '@prisma/client/runtime/client';
+import { Prisma } from '@prisma/client';
 
 type Phase = 'idle' | 'player' | 'dealer' | 'result';
 type Result = 'blackjack' | 'dealer_blackjack' | 'win' | 'lose' | 'bust' | 'push';
@@ -242,7 +243,7 @@ export class BlackjackGateway implements OnGatewayConnection, OnGatewayDisconnec
               data: { balance: next.lessThan(0) ? '0' : next.toFixed() },
             });
           }
-        });
+        }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
       } catch { /* ignore */ }
     }
     if (bet !== undefined) {
