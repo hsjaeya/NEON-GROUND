@@ -160,9 +160,9 @@ export class UserService {
     if (!user.lastDailyBonusAt) return { available: true, nextClaimAt: null };
 
     const msSince = Date.now() - user.lastDailyBonusAt.getTime();
-    if (msSince >= 24 * 60 * 60 * 1000) return { available: true, nextClaimAt: null };
+    if (msSince >= 6 * 60 * 60 * 1000) return { available: true, nextClaimAt: null };
 
-    const nextClaimAt = new Date(user.lastDailyBonusAt.getTime() + 24 * 60 * 60 * 1000);
+    const nextClaimAt = new Date(user.lastDailyBonusAt.getTime() + 6 * 60 * 60 * 1000);
     return { available: false, nextClaimAt };
   }
 
@@ -230,8 +230,8 @@ export class UserService {
 
       if (user.lastDailyBonusAt) {
         const msSince = Date.now() - user.lastDailyBonusAt.getTime();
-        if (msSince < 24 * 60 * 60 * 1000) {
-          const nextClaimAt = new Date(user.lastDailyBonusAt.getTime() + 24 * 60 * 60 * 1000);
+        if (msSince < 6 * 60 * 60 * 1000) {
+          const nextClaimAt = new Date(user.lastDailyBonusAt.getTime() + 6 * 60 * 60 * 1000);
           throw new BadRequestException({ message: '이미 오늘의 보너스를 받았습니다.', nextClaimAt });
         }
       }

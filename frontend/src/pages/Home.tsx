@@ -130,7 +130,7 @@ function BonusCard({
       <span className={styles.cardIcon}>💰</span>
       <div className={styles.cardBody}>
         <span className={`${styles.cardName} ${styles.cardNameFeatured}`}>
-          DAILY BONUS
+          BONUS MONEY
         </span>
         <span className={styles.cardSub}>
           {available === null
@@ -241,7 +241,7 @@ export default function Home() {
           nextClaimAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         });
         alert(
-          `💰 일일 보너스 $${Number(data.bonusAmount).toLocaleString()} 지급 완료!`,
+          `💰 보너스 머니 $${Number(data.bonusAmount).toLocaleString()} 지급 완료!`,
         );
       }
     } catch {
