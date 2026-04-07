@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 type SortKey = 'profit' | 'balance' | 'winrate' | 'games';
 
@@ -44,7 +45,7 @@ export class RankingService {
     const skip = (currentPage - 1) * PAGE_SIZE;
     const where = { user: { deletedAt: null } };
 
-    // profit/games는 DB 레벨에서 정렬·페이징 처리
+    // profit/games는 PlayerStats 컬럼이라 Prisma ORM으로 처리
     if (validSort === 'profit' || validSort === 'games') {
       const orderBy = validSort === 'profit'
         ? { netProfit: 'desc' as const }
@@ -71,22 +72,51 @@ export class RankingService {
       };
     }
 
-    // balance/winrate는 계산 필드라 애플리케이션 레벨 정렬
-    const stats = await this.prisma.playerStats.findMany({
-      where,
-      select: STATS_SELECT,
-    });
+    // balance/winrate는 계산·조인 필드라 raw SQL로 DB 레벨 정렬+페이징
+    const orderExpr =
+      validSort === 'balance'
+        ? Prisma.sql`COALESCE(w.balance, 0) DESC`
+        : Prisma.sql`CASE WHEN ps."totalGames" > 0 THEN ps."totalWins"::float8 / ps."totalGames" ELSE 0 END DESC`;
 
-    const rows = stats.map((s) => toRow(s, 0));
-    rows.sort((a, b) =>
-      validSort === 'balance' ? b.balance - a.balance : b.winRate - a.winRate,
-    );
+    const [countResult, rows] = await Promise.all([
+      this.prisma.$queryRaw<[{ count: bigint }]>`
+        SELECT COUNT(*)::bigint AS count
+        FROM "PlayerStats" ps
+        JOIN "User" u ON ps."userId" = u.id
+        WHERE u."deletedAt" IS NULL
+      `,
+      this.prisma.$queryRaw<any[]>`
+        SELECT
+          u.username,
+          COALESCE(CAST(w.balance AS float8), 0)          AS balance,
+          ps."totalGames",
+          ps."totalWins",
+          CAST(ps."netProfit" AS float8)                  AS "netProfit",
+          CASE WHEN ps."totalGames" > 0
+               THEN ROUND((ps."totalWins"::float8 / ps."totalGames") * 10000) / 100
+               ELSE 0 END                                 AS "winRate"
+        FROM "PlayerStats" ps
+        JOIN "User" u ON ps."userId" = u.id
+        LEFT JOIN "Wallet" w ON w."userId" = u.id AND w."deletedAt" IS NULL
+        WHERE u."deletedAt" IS NULL
+        ORDER BY ${orderExpr}
+        LIMIT ${PAGE_SIZE} OFFSET ${skip}
+      `,
+    ]);
 
-    const total = rows.length;
+    const total = Number(countResult[0].count);
     const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
     const safePage = Math.min(currentPage, totalPages);
-    const start = (safePage - 1) * PAGE_SIZE;
-    const data = rows.slice(start, start + PAGE_SIZE).map((r, i) => ({ ...r, rank: start + i + 1 }));
+
+    const data = rows.map((r, i) => ({
+      rank: skip + i + 1,
+      username: r.username,
+      balance: Number(r.balance),
+      totalGames: Number(r.totalGames),
+      totalWins: Number(r.totalWins),
+      netProfit: Number(r.netProfit),
+      winRate: Number(r.winRate),
+    }));
 
     return { data, total, page: safePage, totalPages };
   }
