@@ -218,9 +218,7 @@ export default function Home() {
     try {
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/user/daily-bonus`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       if (res.ok) setDailyBonus(await res.json());
     } catch {}
@@ -233,10 +231,7 @@ export default function Home() {
     try {
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/user/daily-bonus`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { method: "POST", headers: { Authorization: `Bearer ${token}` } },
       );
       if (res.ok) {
         const data = await res.json();

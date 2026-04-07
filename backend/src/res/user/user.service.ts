@@ -3,10 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { plainToInstance } from 'class-transformer';
-import { UserResponseDto } from './dto/user-response.dto';
 const DAILY_BONUS_AMOUNT = 100000;
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { hash } from 'bcrypt';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -44,7 +42,16 @@ export class UserService {
       include: { wallets: true },
     });
 
-    return plainToInstance(UserResponseDto, created, { excludeExtraneousValues: true });
+    return {
+      id: created.id,
+      email: created.email,
+      username: created.username,
+      createdAt: created.createdAt,
+      wallets: created.wallets.map((w) => ({
+        id: w.id,
+        balance: w.balance.toString(),
+      })),
+    };
   }
 
   async getUser(userId: number) {

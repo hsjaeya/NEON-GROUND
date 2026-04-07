@@ -56,6 +56,11 @@ const isTokenExpired = (token: string): boolean => {
   return Date.now() >= payload.exp * 1000;
 };
 
+const authHeader = (): Record<string, string> => {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -96,25 +101,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!payload?.exp) return;
 
     const msUntilExpiry = payload.exp * 1000 - Date.now();
-    if (msUntilExpiry <= 0) {
-      logout();
-      return;
-    }
+    if (msUntilExpiry <= 0) { logout(); return; }
 
-    const timer = setTimeout(() => {
-      logout();
-    }, msUntilExpiry);
-
+    const timer = setTimeout(() => logout(), msUntilExpiry);
     return () => clearTimeout(timer);
   }, [user]);
-
-  const handleResponse = async (response: Response) => {
-    if (response.status === 401) {
-      logout();
-      throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
-    }
-    return response;
-  };
 
   const register = async (
     username: string,
@@ -135,7 +126,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       const data = await response.json();
-
       const userData: User = {
         id: data.id,
         username: data.username,
@@ -150,9 +140,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!loginResponse.ok) {
-        throw new Error("자동 로그인 실패");
-      }
+      if (!loginResponse.ok) throw new Error("자동 로그인 실패");
 
       const loginData = await loginResponse.json();
       localStorage.setItem("token", loginData.accessToken);
@@ -162,13 +150,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setTimeout(async () => {
         try {
           const userResponse = await fetch(`${API_URL}/user/me`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${loginData.accessToken}`,
-            },
+            headers: { "Content-Type": "application/json", ...authHeader() },
           });
-
           if (userResponse.ok) {
             const freshData = await userResponse.json();
             const freshUserData: User = {
@@ -181,9 +164,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             localStorage.setItem("user", JSON.stringify(freshUserData));
             setUser(freshUserData);
           }
-        } catch (err) {
-          console.error("Auto refresh after register failed:", err);
-        }
+        } catch {}
       }, 500);
 
       return { success: true };
@@ -212,11 +193,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       const data = await response.json();
-
       const decodedToken = decodeToken(data.accessToken);
-      if (!decodedToken) {
-        throw new Error("토큰 디코딩 실패");
-      }
+      if (!decodedToken) throw new Error("토큰 디코딩 실패");
 
       const userData: User = {
         id: decodedToken.id,
@@ -233,13 +211,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setTimeout(async () => {
         try {
           const userResponse = await fetch(`${API_URL}/user/me`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${data.accessToken}`,
-            },
+            headers: { "Content-Type": "application/json", ...authHeader() },
           });
-
           if (userResponse.ok) {
             const freshData = await userResponse.json();
             const freshUserData: User = {
@@ -252,9 +225,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             localStorage.setItem("user", JSON.stringify(freshUserData));
             setUser(freshUserData);
           }
-        } catch (err) {
-          console.error("Auto refresh after login failed:", err);
-        }
+        } catch {}
       }, 500);
 
       return { success: true };
@@ -269,29 +240,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const token = localStorage.getItem("token");
     if (!token || !user) return;
 
-    if (isTokenExpired(token)) {
-      logout();
-      return;
-    }
+    if (isTokenExpired(token)) { logout(); return; }
 
     try {
       const response = await fetch(`${API_URL}/user/me`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", ...authHeader() },
       });
 
-      await handleResponse(response);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `HTTP ${response.status}`);
-      }
+      if (response.status === 401) { logout(); return; }
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const data = await response.json();
-
       const userData: User = {
         id: data.id,
         username: data.username,
@@ -304,29 +263,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(userData);
       setError(null);
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "사용자 정보 갱신 실패";
-      setError(errorMessage);
+      setError(err instanceof Error ? err.message : "사용자 정보 갱신 실패");
     }
   }, [user]);
 
-  const value: AuthContextType = {
-    user,
-    isLoading,
-    error,
-    register,
-    login,
-    logout,
-    refreshUser,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, isLoading, error, register, login, logout, refreshUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 };
