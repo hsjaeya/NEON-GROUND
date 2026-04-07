@@ -79,6 +79,13 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     if (!user) return;
     if (data.roundId !== this.roundId) return;
     if (this.phase !== 'betting' && this.phase !== 'closing') return;
+
+    if (!Array.isArray(data.bets) || data.bets.length === 0 || data.bets.length > 15) return;
+    const valid = data.bets.every(
+      (b) => Number.isInteger(b.amount) && b.amount >= 1000 && b.amount <= 10000000,
+    );
+    if (!valid) return;
+
     this.pendingBets.set(user.id, data.bets);
   }
 
