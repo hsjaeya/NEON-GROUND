@@ -1,7 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap");
 
-   ROOT
-─────────────────────────── */
 .root {
   height: 100vh;
   width: 100%;
@@ -14,8 +12,6 @@
   overflow: hidden;
 }
 
-   OVERLAYS
-─────────────────────────── */
 .scanlines {
   position: fixed;
   inset: 0;
@@ -42,8 +38,6 @@
   background-size: 32px 32px;
 }
 
-   HEADER
-─────────────────────────── */
 .header {
   position: relative;
   z-index: 10;
@@ -113,8 +107,6 @@
   text-shadow: 0 0 8px rgba(0, 255, 200, 0.6);
 }
 
-   MAIN
-─────────────────────────── */
 .main {
   position: relative;
   z-index: 10;
@@ -132,8 +124,6 @@
   overflow: hidden;
 }
 
-   WHEEL SECTION
-─────────────────────────── */
 .wheelSection {
   display: flex;
   flex-direction: column;
@@ -249,8 +239,6 @@
     inset 0 0 16px rgba(255, 0, 144, 0.3);
 }
 
-   RESULT BOX
-─────────────────────────── */
 .resultBox {
   display: flex;
   flex-direction: column;
@@ -320,8 +308,6 @@
   text-shadow: 0 0 12px #ff0055;
 }
 
-   HISTORY
-─────────────────────────── */
 .historyBox {
   display: flex;
   flex-direction: column;
@@ -373,8 +359,6 @@
   border: 1px solid rgba(0, 255, 136, 0.3);
 }
 
-   BETTING SECTION
-─────────────────────────── */
 .bettingSection {
   display: flex;
   flex-direction: column;
@@ -393,8 +377,6 @@
   margin-bottom: 8px;
 }
 
-   CHIP SELECTOR
-─────────────────────────── */
 .chipSelector {
   display: flex;
   flex-direction: column;
@@ -437,16 +419,12 @@
   box-shadow: 0 0 16px rgba(0, 255, 200, 0.4);
 }
 
-   BETTING TABLE
-─────────────────────────── */
 .bettingTable {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-   BETTING TABLE
-─────────────────────────── */
 .bettingTable {
   display: flex;
   flex-direction: column;
@@ -620,8 +598,6 @@
   box-shadow: 0 0 16px rgba(0, 255, 200, 0.4);
 }
 
-   CURRENT BETS
-─────────────────────────── */
 .currentBets {
   display: flex;
   flex-direction: column;
@@ -713,8 +689,6 @@
   letter-spacing: 0.15em;
 }
 
-   ACTIONS
-─────────────────────────── */
 .actions {
   display: grid;
   grid-template-columns: 1fr 1fr 2fr;
@@ -781,16 +755,12 @@
   transform: none;
 }
 
-   SLOT WINNING
-─────────────────────────── */
 .slotWinning {
   animation: slotPop 0.4s ease;
   filter: brightness(2.5) drop-shadow(0 0 8px #fff);
   z-index: 5;
 }
 
-   SESSION BAR
-─────────────────────────── */
 .sessionBar {
   position: relative;
   z-index: 10;
@@ -877,8 +847,6 @@
 
 .stopAutoBtn:hover { background: rgba(255, 40, 80, 0.35); }
 
-   CELEBRATION OVERLAY
-─────────────────────────── */
 .celebrationOverlay {
   position: fixed;
   inset: 0;
@@ -939,8 +907,6 @@
   color: rgba(255, 210, 100, 0.7);
 }
 
-   NEAR MISS
-─────────────────────────── */
 .nearMissInline {
   margin-top: 8px;
   font-size: 12px;
@@ -961,8 +927,6 @@
   animation: nearMissPulse 0.6s ease 3;
 }
 
-   HOT NUMBERS
-─────────────────────────── */
 .cellHot {
   animation: hotGlow 1.5s ease infinite alternate;
   position: relative;
@@ -989,8 +953,6 @@
   box-shadow: 0 0 8px rgba(255, 140, 0, 0.5);
 }
 
-   AUTO SPIN SECTION
-─────────────────────────── */
 .autoSpinSection {
   display: flex;
   flex-direction: column;
@@ -1025,8 +987,6 @@
 
 .autoSpinBtn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-   REBET BUTTON
-─────────────────────────── */
 .rebetBtn {
   font-family: "Share Tech Mono", monospace;
   font-size: 11px;
@@ -1048,8 +1008,6 @@
 
 .rebetBtn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-   KEYFRAMES
-─────────────────────────── */
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -1102,8 +1060,6 @@
   to   { filter: brightness(1.4) drop-shadow(0 0 6px rgba(255, 140, 0, 0.6)); }
 }
 
-   RESPONSIVE
-─────────────────────────── */
 @media (max-width: 1200px) {
   .root {
     height: auto;
@@ -1195,8 +1151,6 @@
   background: rgba(0, 255, 200, 0.5);
 }
 
-   HEADER RIGHT + CONNECTION
-─────────────────────────── */
 .headerRight {
   display: flex;
   align-items: center;
@@ -1210,8 +1164,6 @@
   flex-shrink: 0;
 }
 
-   TIMER
-─────────────────────────── */
 .timerSection {
   display: flex;
   flex-direction: column;
@@ -1276,8 +1228,6 @@
   pointer-events: none;
 }
 
-   CHAT
-─────────────────────────── */
 .chatSection {
   display: flex;
   flex-direction: column;

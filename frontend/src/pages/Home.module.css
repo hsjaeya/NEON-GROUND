@@ -1,7 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap");
 
-   ROOT
-─────────────────────────── */
 .root {
   min-height: 100vh;
   width: 100%;
@@ -14,8 +12,6 @@
   overflow: hidden;
 }
 
-   OVERLAYS
-─────────────────────────── */
 .scanlines {
   position: fixed;
   inset: 0;
@@ -42,8 +38,6 @@
   background-size: 32px 32px;
 }
 
-   HUD
-─────────────────────────── */
 .hud {
   position: relative;
   z-index: 10;
@@ -115,8 +109,6 @@
   background: rgba(0, 255, 200, 0.15);
 }
 
-   MAIN
-─────────────────────────── */
 .main {
   position: relative;
   z-index: 10;
@@ -131,8 +123,6 @@
   box-sizing: border-box;
 }
 
-   TITLE
-─────────────────────────── */
 .titleBlock {
   display: flex;
   flex-direction: column;
@@ -173,8 +163,6 @@
   color: rgba(160, 210, 255, 0.35);
 }
 
-   SECTION LABEL
-─────────────────────────── */
 .section {
   display: flex;
   flex-direction: column;
@@ -200,8 +188,6 @@
   background: rgba(0, 255, 200, 0.12);
 }
 
-   GAME CARDS
-─────────────────────────── */
 .gameGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -350,8 +336,6 @@
   color: #ffcc00;
 }
 
-   DIVIDER
-─────────────────────────── */
 .divider {
   position: relative;
   height: 1px;
@@ -376,8 +360,6 @@
   padding: 0 10px;
 }
 
-   UTIL BUTTONS
-─────────────────────────── */
 .utilRow {
   display: flex;
   gap: 12px;
@@ -426,8 +408,6 @@
   text-shadow: 0 0 8px rgba(255, 60, 60, 0.5);
 }
 
-   DAILY BONUS
-─────────────────────────── */
 .dailyBonusBtn {
   border-color: rgba(255, 200, 0, 0.5) !important;
   color: #ffcc00 !important;
@@ -457,8 +437,6 @@
 }
 
 
-   FOOTER
-─────────────────────────── */
 .footer {
   position: relative;
   z-index: 10;
@@ -488,8 +466,6 @@
   animation: pulseBar 1.2s ease infinite;
 }
 
-   KEYFRAMES
-─────────────────────────── */
 @keyframes blink {
   0%,
   100% {
@@ -510,8 +486,6 @@
   }
 }
 
-   RESPONSIVE
-─────────────────────────── */
 @media (max-width: 768px) {
   .hud {
     padding: 12px 24px;
