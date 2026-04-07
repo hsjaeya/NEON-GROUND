@@ -9,6 +9,7 @@ import {
   Req,
   Query,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { RouletteService } from './roulette.service';
 import { RouletteSpinDto } from './dto/roulette-bet.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -18,6 +19,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 export class RouletteController {
   constructor(private readonly rouletteService: RouletteService) {}
 
+  @Throttle({ game: { ttl: 60000, limit: 120 } })
   @Post('spin')
   async spin(@Req() req, @Body() dto: RouletteSpinDto) {
     const userId = req.user.id; // JWT에서 추출된 사용자 ID
