@@ -18,6 +18,18 @@ model User {
   wallets Wallet[]
   rouletteGames RouletteGame[]
   playerStats PlayerStats?
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model PlayerStats {
