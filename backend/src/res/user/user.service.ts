@@ -221,39 +221,38 @@ export class UserService {
   }
 
   async claimDailyBonus(userId: number) {
-    const user = await this.prisma.user.findFirst({
-      where: { id: userId, deletedAt: null },
-      include: { wallets: { where: { deletedAt: null } } },
-    });
-    if (!user) throw new NotFoundException('User not found');
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.findFirst({
+        where: { id: userId, deletedAt: null },
+        include: { wallets: { where: { deletedAt: null } } },
+      });
+      if (!user) throw new NotFoundException('User not found');
 
-    if (user.lastDailyBonusAt) {
-      const msSince = Date.now() - user.lastDailyBonusAt.getTime();
-      if (msSince < 24 * 60 * 60 * 1000) {
-        const nextClaimAt = new Date(user.lastDailyBonusAt.getTime() + 24 * 60 * 60 * 1000);
-        throw new BadRequestException({ message: '이미 오늘의 보너스를 받았습니다.', nextClaimAt });
+      if (user.lastDailyBonusAt) {
+        const msSince = Date.now() - user.lastDailyBonusAt.getTime();
+        if (msSince < 24 * 60 * 60 * 1000) {
+          const nextClaimAt = new Date(user.lastDailyBonusAt.getTime() + 24 * 60 * 60 * 1000);
+          throw new BadRequestException({ message: '이미 오늘의 보너스를 받았습니다.', nextClaimAt });
+        }
       }
-    }
 
-    const wallet = user.wallets[0];
-    if (!wallet) throw new BadRequestException('Wallet not found');
+      const wallet = user.wallets[0];
+      if (!wallet) throw new BadRequestException('Wallet not found');
 
-    await this.prisma.$transaction([
-      this.prisma.wallet.update({
-        where: { id: wallet.id },
-        data: { balance: { increment: DAILY_BONUS_AMOUNT } },
-      }),
-      this.prisma.user.update({
+      await tx.user.update({
         where: { id: userId },
         data: { lastDailyBonusAt: new Date() },
-      }),
-    ]);
+      });
 
-    const updated = await this.prisma.wallet.findUnique({ where: { id: wallet.id } });
+      return tx.wallet.update({
+        where: { id: wallet.id },
+        data: { balance: { increment: DAILY_BONUS_AMOUNT } },
+      });
+    }, { isolationLevel: 'Serializable' });
 
     return {
       bonusAmount: DAILY_BONUS_AMOUNT,
-      newBalance: updated?.balance.toString(),
+      newBalance: updated.balance.toString(),
     };
   }
 }
