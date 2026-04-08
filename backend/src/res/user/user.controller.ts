@@ -8,7 +8,7 @@ import {
   Req,
   Patch,
 } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
+import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
@@ -28,6 +28,7 @@ export class UserController {
     return this.userService.register(email, username, password);
   }
 
+  @SkipThrottle()
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
   async getUser(@Req() req) {
