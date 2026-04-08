@@ -15,7 +15,7 @@ import { RankingModule } from './res/ranking/ranking.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ThrottlerModule.forRoot([
-      { name: 'default', ttl: 60000, limit: 60 },   // 기본: 1분에 60회
+      { name: 'default', ttl: 60000, limit: 200 },  // 기본: 1분에 200회
       { name: 'auth', ttl: 60000, limit: 10 },       // 인증: 1분에 10회
       { name: 'game', ttl: 60000, limit: 120 },      // 게임: 1분에 120회
     ]),

@@ -28,7 +28,7 @@ export class UserController {
     return this.userService.register(email, username, password);
   }
 
-  @SkipThrottle()
+  @SkipThrottle({ default: true, auth: true, game: true })
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
   async getUser(@Req() req) {
