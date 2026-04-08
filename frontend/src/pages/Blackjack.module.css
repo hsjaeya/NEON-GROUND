@@ -404,7 +404,7 @@
 .btnDeal:disabled { opacity: 0.25; cursor: default; }
 
 /* Action panel */
-.actionPanel { display: flex; gap: 8px; }
+.actionPanel { display: flex; gap: 8px; flex-wrap: wrap; }
 .btnAction {
   flex: 1; padding: 18px 8px;
   font-family: "Orbitron", monospace; font-weight: 700; font-size: 12px; letter-spacing: 0.2em;
@@ -462,6 +462,7 @@
 .backLink:hover { color: #00ffc8; }
 
 .errorMsg {
+  width: 100%;
   font-size: 8px; letter-spacing: 0.22em;
   color: #ff44bb; padding: 6px 0; text-align: center;
   text-shadow: 0 0 8px rgba(255,34,136,0.5);
