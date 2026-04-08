@@ -24,6 +24,33 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+// 모듈 레벨 refresh — context 밖(소켓 연결 등)에서도 사용 가능
+let _refreshPromise: Promise<string | null> | null = null;
+export const getValidToken = async (): Promise<string | null> => {
+  const token = localStorage.getItem("token");
+  if (token && !isTokenExpiredRaw(token)) return token;
+
+  if (_refreshPromise) return _refreshPromise;
+  _refreshPromise = (async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (!refreshToken) return null;
+    try {
+      const res = await fetch(`${API_URL}/auth/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken }),
+      });
+      if (!res.ok) { localStorage.removeItem("token"); localStorage.removeItem("refreshToken"); return null; }
+      const data = await res.json();
+      localStorage.setItem("token", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+      return data.accessToken;
+    } catch { return null; }
+    finally { _refreshPromise = null; }
+  })();
+  return _refreshPromise;
+};
+
 const decodeToken = (token: string): any => {
   try {
     const base64Url = token.split(".")[1];
@@ -34,11 +61,12 @@ const decodeToken = (token: string): any => {
   } catch { return null; }
 };
 
-const isTokenExpired = (token: string): boolean => {
+const isTokenExpiredRaw = (token: string): boolean => {
   const payload = decodeToken(token);
   if (!payload?.exp) return true;
   return Date.now() >= payload.exp * 1000;
 };
+const isTokenExpired = isTokenExpiredRaw;
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);

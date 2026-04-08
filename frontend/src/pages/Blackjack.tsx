@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
-import { useAuth } from "../context/Authcontext";
+import { useAuth, getValidToken } from "../context/Authcontext";
 import styles from "./Blackjack.module.css";
 import BlackjackRules from "../components/BlackjackRules";
 
@@ -89,7 +89,6 @@ function ValueBadge({ value, bust }: { value: number; bust?: boolean }) {
 export default function Blackjack() {
   const { user, refreshUser } = useAuth();
   const socketRef = useRef<Socket | null>(null);
-  const token = localStorage.getItem("token");
 
   const [gs, setGs] = useState<GameState | null>(null);
   const [localBet, setLocalBet] = useState(0);
@@ -100,28 +99,33 @@ export default function Blackjack() {
   const balance = parseFloat(String(user?.balance ?? 0));
 
   useEffect(() => {
-    const socket = io(`${WS_URL}/blackjack`, { auth: { token }, transports: ["websocket"] });
-    socketRef.current = socket;
+    let cancelled = false;
+    getValidToken().then((token) => {
+      if (cancelled || !token) return;
+      const socket = io(`${WS_URL}/blackjack`, { auth: { token }, transports: ["websocket"] });
 
-    socket.on("gameState", (state: GameState) => {
-      setGs(prev => {
-        // idle → player 전환 시 딜 애니메이션 트리거
-        if (prev?.phase === "idle" && state.phase === "player") {
-          setDealKey(k => k + 1);
-        }
-        if (state.phase === "result") {
-          refreshUser();
-        }
-        return state;
+      socket.on("gameState", (state: GameState) => {
+        setGs(prev => {
+          // idle → player 전환 시 딜 애니메이션 트리거
+          if (prev?.phase === "idle" && state.phase === "player") {
+            setDealKey(k => k + 1);
+          }
+          if (state.phase === "result") {
+            refreshUser();
+          }
+          return state;
+        });
+        setError("");
       });
-      setError("");
+
+      socket.on("error", (d: { message: string }) => setError(d.message));
+      socket.on("connect_error", () => setError("CONNECTION ERROR"));
+
+      socketRef.current = socket;
     });
 
-    socket.on("error", (d: { message: string }) => setError(d.message));
-    socket.on("connect_error", () => setError("CONNECTION ERROR"));
-
-    return () => { socket.disconnect(); };
-  }, [token, refreshUser]);
+    return () => { cancelled = true; socketRef.current?.disconnect(); };
+  }, [refreshUser]);
 
   const send = useCallback((event: string, data?: unknown) => {
     setError("");
