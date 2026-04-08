@@ -40,24 +40,16 @@ export default function Ranking() {
     setLoading(true);
     setError("");
 
-    const load = (retries = 2) => {
-      fetch(`${import.meta.env.VITE_API_URL}/ranking?sort=${sort}&page=${page}`, {
-        headers: { Authorization: `Bearer ${token}` },
+    fetch(`${import.meta.env.VITE_API_URL}/ranking?sort=${sort}&page=${page}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => {
+        if (!r.ok) throw new Error("FETCH FAILED");
+        return r.json();
       })
-        .then((r) => {
-          if (r.status === 429 && retries > 0) {
-            setTimeout(() => load(retries - 1), 1500);
-            return;
-          }
-          if (!r.ok) throw new Error("FETCH FAILED");
-          return r.json();
-        })
-        .then((data) => { if (data) setRes(data as RankingResponse); })
-        .catch(() => setError("CONNECTION ERROR"))
-        .finally(() => setLoading(false));
-    };
-
-    load();
+      .then((data: RankingResponse) => setRes(data))
+      .catch(() => setError("CONNECTION ERROR"))
+      .finally(() => setLoading(false));
   }, [sort, page]);
 
   const handleSort = (key: SortKey) => {
