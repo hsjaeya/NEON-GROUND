@@ -60,7 +60,7 @@ function StatBox({
 }
 
 export default function Profile() {
-  const { refreshUser, logout } = useAuth();
+  const { refreshUser, logout, authFetch } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -81,10 +81,8 @@ export default function Profile() {
   const handleDeleteAccount = async () => {
     setDeleting(true);
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/user/me`, {
+      const res = await authFetch(`${import.meta.env.VITE_API_URL}/user/me`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
         logout();
@@ -101,10 +99,7 @@ export default function Profile() {
   }, []);
 
   const fetchProfile = () => {
-    const token = localStorage.getItem("token");
-    fetch(`${import.meta.env.VITE_API_URL}/user/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    authFetch(`${import.meta.env.VITE_API_URL}/user/profile`)
       .then((r) => {
         if (!r.ok) throw new Error();
         return r.json();
@@ -149,10 +144,9 @@ export default function Profile() {
     setSaving(true);
     setSaveError("");
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/user/me`, {
+      const res = await authFetch(`${import.meta.env.VITE_API_URL}/user/me`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
       const data = await res.json();
