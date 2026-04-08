@@ -173,7 +173,7 @@ function UtilButton({ label, danger = false, onClick, to }: Util) {
 }
 
 export default function Home() {
-  const { user, logout, refreshUser } = useAuth();
+  const { user, logout, refreshUser, authFetch } = useAuth();
   const navigate = useNavigate();
 
   const [loginPrompt, setLoginPrompt] = useState(false);
@@ -213,26 +213,22 @@ export default function Home() {
   }, [dailyBonus?.nextClaimAt]);
 
   const fetchDailyBonusStatus = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/user/daily-bonus`,
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      const res = await authFetch(`${import.meta.env.VITE_API_URL}/user/daily-bonus`);
+      if (res.status === 401) { logout(); return; }
       if (res.ok) setDailyBonus(await res.json());
     } catch {}
   };
 
   const handleClaimBonus = async () => {
-    const token = localStorage.getItem("token");
-    if (!token || claimingBonus) return;
+    if (claimingBonus) return;
     setClaimingBonus(true);
     try {
-      const res = await fetch(
+      const res = await authFetch(
         `${import.meta.env.VITE_API_URL}/user/daily-bonus`,
-        { method: "POST", headers: { Authorization: `Bearer ${token}` } },
+        { method: "POST" },
       );
+      if (res.status === 401) { logout(); return; }
       if (res.ok) {
         const data = await res.json();
         await refreshUser();

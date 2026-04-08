@@ -40,7 +40,11 @@ export const getValidToken = async (): Promise<string | null> => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refreshToken }),
       });
-      if (!res.ok) { localStorage.removeItem("token"); localStorage.removeItem("refreshToken"); return null; }
+      if (!res.ok) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        return null;
+      }
       const data = await res.json();
       localStorage.setItem("token", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
@@ -51,7 +55,7 @@ export const getValidToken = async (): Promise<string | null> => {
   return _refreshPromise;
 };
 
-const decodeToken = (token: string): any => {
+const decodeToken = (token: string): { exp?: number; id?: number; username?: string; email?: string } | null => {
   try {
     const base64Url = token.split(".")[1];
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
@@ -66,21 +70,34 @@ const isTokenExpiredRaw = (token: string): boolean => {
   if (!payload?.exp) return true;
   return Date.now() >= payload.exp * 1000;
 };
-const isTokenExpired = isTokenExpiredRaw;
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // 동시 refresh 요청 방지용
+
   const refreshPromise = useRef<Promise<string | null> | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // 항상 최신 함수를 참조하기 위한 ref (이벤트 리스너에서 stale closure 방지)
+  const silentRefreshRef = useRef<() => Promise<string | null>>(async () => null);
+  const scheduleRefreshRef = useRef<() => void>(() => {});
 
   const clearSession = () => {
+    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
     setUser(null);
     setError(null);
+  };
+
+  // 세션 만료: 알림 + 로그인 페이지로 이동
+  const expireSession = () => {
+    clearSession();
+    if (window.location.pathname !== "/login") {
+      alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+      window.location.replace("/login");
+    }
   };
 
   const logout = async () => {
@@ -95,24 +112,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     clearSession();
   };
 
-  // 앱 로드 시 저장된 세션 복원
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
-
-    if (token && savedUser && !isTokenExpired(token)) {
-      try { setUser(JSON.parse(savedUser)); } catch { clearSession(); }
-    } else if (localStorage.getItem("refreshToken")) {
-      // access token 만료됐지만 refresh token 있으면 조용히 갱신
-      silentRefresh().finally(() => setIsLoading(false));
-      return;
-    } else {
-      clearSession();
-    }
-    setIsLoading(false);
-  }, []);
-
-  // access token을 refresh token으로 갱신, 새 access token 반환
+  // access token을 refresh token으로 갱신, 새 access token 반환 (실패 시 null)
   const silentRefresh = async (): Promise<string | null> => {
     if (refreshPromise.current) return refreshPromise.current;
 
@@ -125,35 +125,142 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ refreshToken }),
         });
-        if (!res.ok) { clearSession(); return null; }
+        if (!res.ok) return null;
         const data = await res.json();
         localStorage.setItem("token", data.accessToken);
         localStorage.setItem("refreshToken", data.refreshToken);
         return data.accessToken;
-      } catch { clearSession(); return null; }
+      } catch { return null; }
       finally { refreshPromise.current = null; }
     })();
 
     return refreshPromise.current;
   };
 
-  // 인증이 필요한 모든 fetch에 사용 — 401 시 자동 refresh 후 재시도
+  // 만료 1분 전에 선제적으로 refresh 스케줄링
+  const scheduleRefresh = () => {
+    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    const payload = decodeToken(token);
+    if (!payload?.exp) return;
+    const msUntilRefresh = Math.max(0, payload.exp * 1000 - Date.now() - 60 * 1000); // 만료 1분 전
+
+    timerRef.current = setTimeout(async () => {
+      const newToken = await silentRefreshRef.current();
+      if (newToken) {
+        scheduleRefreshRef.current(); // 새 토큰으로 다시 스케줄
+      } else {
+        expireSession();
+      }
+    }, msUntilRefresh);
+  };
+
+  // 최신 함수 ref 업데이트
+  useEffect(() => { silentRefreshRef.current = silentRefresh; });
+  useEffect(() => { scheduleRefreshRef.current = scheduleRefresh; });
+
+  // 앱 로드 시 저장된 세션 복원
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
+
+    if (token && savedUser && !isTokenExpiredRaw(token)) {
+      try { setUser(JSON.parse(savedUser)); }
+      catch { clearSession(); setIsLoading(false); }
+      setIsLoading(false);
+    } else if (localStorage.getItem("refreshToken")) {
+      silentRefresh().then((newToken) => {
+        if (newToken) {
+          fetch(`${API_URL}/user/me`, { headers: { Authorization: `Bearer ${newToken}` } })
+            .then((r) => r.ok ? r.json() : null)
+            .then((data) => {
+              if (data) {
+                const userData: User = {
+                  id: data.id, username: data.username, email: data.email,
+                  balance: data.wallets?.[0]?.balance || "0", createdAt: data.createdAt,
+                };
+                localStorage.setItem("user", JSON.stringify(userData));
+                setUser(userData);
+              }
+            })
+            .catch(() => {})
+            .finally(() => setIsLoading(false));
+        } else {
+          clearSession();
+          setIsLoading(false);
+        }
+      });
+    } else {
+      clearSession();
+      setIsLoading(false);
+    }
+  }, []);
+
+  // user가 설정되면 refresh 타이머 스케줄
+  useEffect(() => {
+    if (user) scheduleRefresh();
+    return () => { if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; } };
+  }, [user?.id]);
+
+  // 탭 포커스 복귀 시 토큰 유효성 체크
+  useEffect(() => {
+    const onVisible = async () => {
+      if (document.visibilityState !== "visible" || !user) return;
+      const token = localStorage.getItem("token");
+      if (!token && !localStorage.getItem("refreshToken")) {
+        // 다른 탭에서 로그아웃됨
+        clearSession();
+        return;
+      }
+      if (!token || isTokenExpiredRaw(token)) {
+        const newToken = await silentRefreshRef.current();
+        if (newToken) scheduleRefreshRef.current();
+        else expireSession();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [user]);
+
+  // 다른 탭과 토큰/세션 상태 동기화
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "token") {
+        if (e.newValue) {
+          // 다른 탭이 토큰 갱신 -> 타이머 재설정
+          scheduleRefreshRef.current();
+        } else {
+          // 다른 탭이 로그아웃
+          setUser(null);
+          if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
+          if (window.location.pathname !== "/login") window.location.replace("/login");
+        }
+      }
+      if (e.key === "user" && e.newValue) {
+        try { setUser(JSON.parse(e.newValue)); } catch {}
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  // 인증이 필요한 fetch — 401 시 자동 refresh 후 1회 재시도
   const authFetch = useCallback(async (input: RequestInfo, init?: RequestInit): Promise<Response> => {
     let token = localStorage.getItem("token");
 
-    if (!token || isTokenExpired(token)) {
+    if (!token || isTokenExpiredRaw(token)) {
       token = await silentRefresh();
       if (!token) return new Response(null, { status: 401 });
     }
 
-    const headers = { ...(init?.headers || {}), Authorization: `Bearer ${token}` };
-    const res = await fetch(input, { ...init, headers });
+    const makeHeaders = (t: string) => ({ ...(init?.headers ?? {}), Authorization: `Bearer ${t}` });
+    const res = await fetch(input, { ...init, headers: makeHeaders(token) });
 
     if (res.status === 401) {
       token = await silentRefresh();
       if (!token) return res;
-      const retryHeaders = { ...(init?.headers || {}), Authorization: `Bearer ${token}` };
-      return fetch(input, { ...init, headers: retryHeaders });
+      return fetch(input, { ...init, headers: makeHeaders(token) });
     }
 
     return res;
@@ -215,8 +322,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (!decoded) throw new Error("토큰 디코딩 실패");
 
       const userData: User = {
-        id: decoded.id, username: decoded.username, email: decoded.email,
-        balance: decoded.balance || 0, createdAt: decoded.createdAt,
+        id: decoded.id!, username: decoded.username!, email: decoded.email!,
+        balance: 0, createdAt: undefined,
       };
 
       localStorage.setItem("token", data.accessToken);
@@ -252,7 +359,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (!user) return;
     try {
       const res = await authFetch(`${API_URL}/user/me`);
-      if (res.status === 401) { await logout(); return; }
+      if (res.status === 401) { expireSession(); return; }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       const data = await res.json();
