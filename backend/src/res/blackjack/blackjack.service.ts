@@ -1,26 +1,56 @@
 import { Injectable } from '@nestjs/common';
+import { randomInt } from 'crypto';
 
 export type Suit = 'S' | 'H' | 'D' | 'C';
-export type Rank = '2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'10'|'J'|'Q'|'K'|'A';
-export interface Card { suit: Suit; rank: Rank; }
+export type Rank =
+  | '2'
+  | '3'
+  | '4'
+  | '5'
+  | '6'
+  | '7'
+  | '8'
+  | '9'
+  | '10'
+  | 'J'
+  | 'Q'
+  | 'K'
+  | 'A';
+export interface Card {
+  suit: Suit;
+  rank: Rank;
+}
 
-const RANKS: Rank[] = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-const SUITS: Suit[] = ['S','H','D','C'];
+const RANKS: Rank[] = [
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  'J',
+  'Q',
+  'K',
+  'A',
+];
+const SUITS: Suit[] = ['S', 'H', 'D', 'C'];
 
 @Injectable()
 export class BlackjackService {
   buildDeck(): Card[] {
     const deck: Card[] = [];
     for (const suit of SUITS)
-      for (const rank of RANKS)
-        deck.push({ suit, rank });
+      for (const rank of RANKS) deck.push({ suit, rank });
     return deck;
   }
 
   shuffle(deck: Card[]): Card[] {
     const d = [...deck];
     for (let i = d.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = randomInt(0, i + 1); // 0 ~ i (i 포함)
       [d[i], d[j]] = [d[j], d[i]];
     }
     return d;
@@ -30,11 +60,16 @@ export class BlackjackService {
     let val = 0;
     let aces = 0;
     for (const c of cards) {
-      if (c.rank === 'A') { aces++; val += 11; }
-      else if (['J', 'Q', 'K'].includes(c.rank)) val += 10;
+      if (c.rank === 'A') {
+        aces++;
+        val += 11;
+      } else if (['J', 'Q', 'K'].includes(c.rank)) val += 10;
       else val += parseInt(c.rank);
     }
-    while (val > 21 && aces > 0) { val -= 10; aces--; }
+    while (val > 21 && aces > 0) {
+      val -= 10;
+      aces--;
+    }
     return val;
   }
 
