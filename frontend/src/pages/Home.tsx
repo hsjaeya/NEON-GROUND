@@ -245,7 +245,7 @@ export default function Home() {
         await refreshUser();
         setDailyBonus({
           available: false,
-          nextClaimAt: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
+          nextClaimAt: new Date(Date.now() + 1 * 60 * 60 * 1000).toISOString(),
         });
         alert(
           `💰 보너스 머니 $${Number(data.bonusAmount).toLocaleString()} 지급 완료!`,
