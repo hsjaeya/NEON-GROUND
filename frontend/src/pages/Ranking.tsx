@@ -28,6 +28,9 @@ const TABS: { key: SortKey; label: string }[] = [
   { key: "games",   label: "GAMES"      },
 ];
 
+const cache = new Map<string, { data: RankingResponse; ts: number }>();
+const CACHE_TTL = 60 * 1000; // 60초
+
 export default function Ranking() {
   const [sort, setSort] = useState<SortKey>("profit");
   const [page, setPage] = useState(1);
@@ -37,19 +40,37 @@ export default function Ranking() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const key = `${sort}_${page}`;
+    const cached = cache.get(key);
+
+    if (cached && Date.now() - cached.ts < CACHE_TTL) {
+      setRes(cached.data);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError("");
 
-    fetch(`${import.meta.env.VITE_API_URL}/ranking?sort=${sort}&page=${page}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => {
-        if (!r.ok) throw new Error("FETCH FAILED");
-        return r.json();
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      fetch(`${import.meta.env.VITE_API_URL}/ranking?sort=${sort}&page=${page}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        signal: controller.signal,
       })
-      .then((data: RankingResponse) => setRes(data))
-      .catch(() => setError("CONNECTION ERROR"))
-      .finally(() => setLoading(false));
+        .then((r) => {
+          if (!r.ok) throw new Error("FETCH FAILED");
+          return r.json();
+        })
+        .then((data: RankingResponse) => {
+          cache.set(key, { data, ts: Date.now() });
+          setRes(data);
+        })
+        .catch((e) => { if (e.name !== "AbortError") setError("CONNECTION ERROR"); })
+        .finally(() => setLoading(false));
+    }, 200);
+
+    return () => { clearTimeout(timer); controller.abort(); };
   }, [sort, page]);
 
   const handleSort = (key: SortKey) => {

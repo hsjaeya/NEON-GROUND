@@ -78,6 +78,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const refreshPromise = useRef<Promise<string | null> | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const refreshUserTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastRefreshUserAt = useRef<number>(0);
   // 항상 최신 함수를 참조하기 위한 ref (이벤트 리스너에서 stale closure 방지)
   const silentRefreshRef = useRef<() => Promise<string | null>>(async () => null);
   const scheduleRefreshRef = useRef<() => void>(() => {});
@@ -357,22 +359,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const refreshUser = useCallback(async (): Promise<void> => {
     if (!user) return;
-    try {
-      const res = await authFetch(`${API_URL}/user/me`);
-      if (res.status === 401) { expireSession(); return; }
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    // 3초 이내 중복 호출 무시
+    if (Date.now() - lastRefreshUserAt.current < 3000) return;
 
-      const data = await res.json();
-      const userData: User = {
-        id: data.id, username: data.username, email: data.email,
-        balance: data.wallets?.[0]?.balance || "0", createdAt: data.createdAt,
-      };
-      localStorage.setItem("user", JSON.stringify(userData));
-      setUser(userData);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "사용자 정보 갱신 실패");
-    }
+    if (refreshUserTimer.current) clearTimeout(refreshUserTimer.current);
+    refreshUserTimer.current = setTimeout(async () => {
+      lastRefreshUserAt.current = Date.now();
+      try {
+        const res = await authFetch(`${API_URL}/user/me`);
+        if (res.status === 401) { expireSession(); return; }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const data = await res.json();
+        const userData: User = {
+          id: data.id, username: data.username, email: data.email,
+          balance: data.wallets?.[0]?.balance || "0", createdAt: data.createdAt,
+        };
+        localStorage.setItem("user", JSON.stringify(userData));
+        setUser(userData);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "사용자 정보 갱신 실패");
+      }
+    }, 300);
   }, [user, authFetch]);
 
   return (

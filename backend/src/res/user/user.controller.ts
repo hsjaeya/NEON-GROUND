@@ -8,9 +8,8 @@ import {
   Req,
   Patch,
 } from '@nestjs/common';
-import { Throttle, SkipThrottle } from '@nestjs/throttler';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { UserService } from './user.service';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -18,6 +17,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @UseGuards(ThrottlerGuard)
   @Throttle({ auth: { ttl: 60000, limit: 10 } })
   @Post('register')
   async register(
@@ -28,7 +28,6 @@ export class UserController {
     return this.userService.register(email, username, password);
   }
 
-  @SkipThrottle({ default: true, auth: true, game: true })
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
   async getUser(@Req() req) {

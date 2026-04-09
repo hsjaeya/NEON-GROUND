@@ -172,6 +172,8 @@ function UtilButton({ label, danger = false, onClick, to }: Util) {
   );
 }
 
+let bonusCache: { data: { available: boolean; nextClaimAt: string | null }; ts: number; userId: number } | null = null;
+
 export default function Home() {
   const { user, logout, refreshUser, authFetch } = useAuth();
   const navigate = useNavigate();
@@ -213,10 +215,18 @@ export default function Home() {
   }, [dailyBonus?.nextClaimAt]);
 
   const fetchDailyBonusStatus = async () => {
+    if (bonusCache && bonusCache.userId === user?.id && Date.now() - bonusCache.ts < 60 * 1000) {
+      setDailyBonus(bonusCache.data);
+      return;
+    }
     try {
       const res = await authFetch(`${import.meta.env.VITE_API_URL}/user/daily-bonus`);
       if (res.status === 401) { logout(); return; }
-      if (res.ok) setDailyBonus(await res.json());
+      if (res.ok) {
+        const data = await res.json();
+        bonusCache = { data, ts: Date.now(), userId: user!.id };
+        setDailyBonus(data);
+      }
     } catch {}
   };
 
@@ -231,6 +241,7 @@ export default function Home() {
       if (res.status === 401) { logout(); return; }
       if (res.ok) {
         const data = await res.json();
+        bonusCache = null; // 캐시 무효화
         await refreshUser();
         setDailyBonus({
           available: false,
