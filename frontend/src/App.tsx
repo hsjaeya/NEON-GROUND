@@ -1,6 +1,7 @@
 import "./App.css";
 import type { ReactNode } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { AuthProvider, useAuth } from "./context/Authcontext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -127,6 +128,7 @@ function App(): React.ReactElement {
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <SpeedInsights />
       </div>
     </AuthProvider>
   );
