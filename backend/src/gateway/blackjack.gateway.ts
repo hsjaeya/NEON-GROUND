@@ -116,8 +116,8 @@ export class BlackjackGateway implements OnGatewayConnection, OnGatewayDisconnec
         result === 'push' ? 0 : -bet;
       session.phase = 'result';
       session.result = result;
-      await this.applyNet(user.id, session.net, bet);
-      client.emit('gameState', this.serialize(user.id, true));
+      const balance0 = await this.applyNet(user.id, session.net, bet);
+      client.emit('gameState', { ...this.serialize(user.id, true), balance: balance0 });
       return;
     }
 
@@ -138,8 +138,8 @@ export class BlackjackGateway implements OnGatewayConnection, OnGatewayDisconnec
       session.result = 'bust';
       session.net = -session.bet;
       session.phase = 'result';
-      await this.applyNet(user.id, session.net, session.bet);
-      client.emit('gameState', this.serialize(user.id, true));
+      const balance1 = await this.applyNet(user.id, session.net, session.bet);
+      client.emit('gameState', { ...this.serialize(user.id, true), balance: balance1 });
     } else if (this.bj.handValue(session.playerHand) === 21) {
       // Auto-stand on 21
       await this.runDealer(user.id, client);
@@ -180,8 +180,8 @@ export class BlackjackGateway implements OnGatewayConnection, OnGatewayDisconnec
       session.result = 'bust';
       session.net = -session.bet;
       session.phase = 'result';
-      await this.applyNet(user.id, session.net, session.bet);
-      client.emit('gameState', this.serialize(user.id, true));
+      const balance2 = await this.applyNet(user.id, session.net, session.bet);
+      client.emit('gameState', { ...this.serialize(user.id, true), balance: balance2 });
     } else {
       // Show the doubled hand briefly before dealer runs
       client.emit('gameState', this.serialize(user.id, false));
@@ -227,30 +227,42 @@ export class BlackjackGateway implements OnGatewayConnection, OnGatewayDisconnec
     session.result = result;
     session.net = result === 'win' ? session.bet : result === 'push' ? 0 : -session.bet;
     session.phase = 'result';
-    await this.applyNet(userId, session.net, session.bet);
-    client.emit('gameState', this.serialize(userId, true));
+    const balance3 = await this.applyNet(userId, session.net, session.bet);
+    client.emit('gameState', { ...this.serialize(userId, true), balance: balance3 });
   }
 
-  private async applyNet(userId: number, net: number, bet?: number) {
+  private async applyNet(userId: number, net: number, bet?: number): Promise<number> {
+    let newBalance: number | null = null;
+
     if (net !== 0) {
       try {
         await this.prisma.$transaction(async (tx) => {
           const w = await tx.wallet.findFirst({ where: { userId } });
           if (w) {
             const next = new Decimal(w.balance.toString()).add(new Decimal(net));
+            const clamped = next.lessThan(0) ? new Decimal(0) : next;
             await tx.wallet.update({
               where: { id: w.id },
-              data: { balance: next.lessThan(0) ? '0' : next.toFixed() },
+              data: { balance: clamped.toFixed() },
             });
+            newBalance = parseFloat(clamped.toFixed());
           }
         }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
       } catch { /* ignore */ }
     }
+
+    if (newBalance === null) {
+      const w = await this.prisma.wallet.findFirst({ where: { userId } });
+      newBalance = w ? parseFloat(w.balance.toString()) : 0;
+    }
+
     if (bet !== undefined) {
       const wagered = bet;
-      const payout = bet + net; // net can be negative (loss), zero (push), or positive (win)
+      const payout = bet + net;
       this.stats.recordGame(userId, wagered, payout < 0 ? 0 : payout).catch(() => {});
     }
+
+    return newBalance;
   }
 
   private serialize(userId: number, revealDealer: boolean) {

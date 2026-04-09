@@ -24,6 +24,7 @@ interface GameState {
   result?: Result;
   net?: number;
   canDouble: boolean;
+  balance?: number;
 }
 
 const SUIT_SYMBOL: Record<string, string> = { S: "♠", H: "♥", D: "♦", C: "♣" };
@@ -95,8 +96,9 @@ export default function Blackjack() {
   const [lastBet, setLastBet] = useState(0);
   const [error, setError] = useState("");
   const [dealKey, setDealKey] = useState(0);
+  const [balanceOverride, setBalanceOverride] = useState<number | null>(null);
 
-  const balance = parseFloat(String(user?.balance ?? 0));
+  const balance = balanceOverride ?? parseFloat(String(user?.balance ?? 0));
 
   useEffect(() => {
     let cancelled = false;
@@ -105,6 +107,9 @@ export default function Blackjack() {
       const socket = io(`${WS_URL}/blackjack`, { auth: { token }, transports: ["websocket"] });
 
       socket.on("gameState", (state: GameState) => {
+        if (state.balance !== undefined) {
+          setBalanceOverride(state.balance);
+        }
         setGs(prev => {
           // idle → player 전환 시 딜 애니메이션 트리거
           if (prev?.phase === "idle" && state.phase === "player") {
@@ -133,6 +138,7 @@ export default function Blackjack() {
   }, []);
 
   const addChip = (amount: number) => {
+    setError("");
     setLocalBet(b => {
       const next = b + amount;
       return next > Math.min(balance, 500000) ? b : next;
