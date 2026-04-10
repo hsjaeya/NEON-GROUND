@@ -1,5 +1,6 @@
 
 import { Injectable, BadRequestException } from '@nestjs/common';
+import { randomInt } from 'crypto';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RouletteSpinDto, BetType } from './dto/roulette-bet.dto';
@@ -163,7 +164,7 @@ export class RouletteService {
     const betAmount = new Decimal(totalBet);
 
     // 결과는 트랜잭션 밖에서 미리 생성 (DB 의존 없음)
-    const result = Math.floor(Math.random() * 37);
+    const result = randomInt(0, 37);
 
     let totalWin = new Decimal(0);
     const betResults = dto.bets.map((bet) => {
